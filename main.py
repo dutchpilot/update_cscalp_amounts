@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QMessageBox
 
 import design  # Это наш конвертированный файл дизайна
 
-
 def my_round(var, size):
     big_size = int(size) * 100000
     result = ((var * 100000) // (size * 100000)) * size
@@ -13,7 +12,6 @@ def my_round(var, size):
         return math.floor(result)
     else:
         return math.floor(result * 100000) / 100000
-
 
 class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
     def __init__(self):
@@ -44,8 +42,6 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 self.editPart4.setText(data.split('\n', 10)[5])
                 self.editPart5.setText(data.split('\n', 10)[6])
                 self.editDepo.setText(data.split('\n', 10)[7])
-
-
         else:
             self.listWidget.addItem('Ошибка! Файл config.ini не найден')
             self.editCode.setText('0')
@@ -62,6 +58,7 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         if self.comboBox.currentIndex() != 0:
             self.listWidget.addItem('Режим [' + self.comboBox.currentText() + '] находится в разработке')
             self.pushButton.setEnabled(False)
+            self.editLeverage.setDisabled(True)
         else:
             self.listWidget.addItem('Установлен режим [' + self.comboBox.currentText() + ']')
             self.pushButton.setEnabled(True)
