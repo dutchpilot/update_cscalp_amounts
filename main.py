@@ -2,6 +2,7 @@ import sys, os, shutil, time, requests, math, psutil
 
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5 import QtGui
 
 import design  # Это наш конвертированный файл дизайна
 
@@ -18,6 +19,8 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         super().__init__()
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
+
+        self.setWindowIcon(QtGui.QIcon('icon.ico'))
         self.pushButton.clicked.connect(self.updateAmounts)  # Выполнить функцию browse_folder
         self.pushButtonAbout.clicked.connect(self.showDialog)
 
@@ -58,10 +61,14 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         if self.comboBox.currentIndex() != 0:
             self.listWidget.addItem('Режим [' + self.comboBox.currentText() + '] находится в разработке')
             self.pushButton.setEnabled(False)
-            self.editLeverage.setDisabled(True)
         else:
             self.listWidget.addItem('Установлен режим [' + self.comboBox.currentText() + ']')
             self.pushButton.setEnabled(True)
+
+        if (self.comboBox.currentIndex() == 1)or((self.comboBox.currentIndex() == 3)):
+            self.editLeverage.setEnabled(False)
+        else:
+            self.editLeverage.setEnabled(True)
 
     def closeEvent(self, event):
         with open('config.ini', "w") as f:
@@ -83,12 +90,11 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 self.listWidget.addItem('Ошибка! Запущен CScalp - выполнение невозможно.')
                 return
 
-        depo = self.editDepo.text()
-        if (depo.isdigit() == False):
+        try:
+            depo = float(self.editDepo.text())
+        except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение депозита')
             return
-        else:
-            depo = float(self.editDepo.text())
 
         LEVERAGE = self.editLeverage.text()
         if (LEVERAGE.isdigit() == False):
@@ -97,40 +103,37 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         else:
             LEVERAGE = float(self.editLeverage.text())
 
-        PART1 = self.editPart1.text()
-        if (PART1.isdigit() == False):
+        try:
+            PART1 = float(self.editPart1.text())
+        except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 1')
             return
-        else:
-            PART1 = float(self.editPart1.text())
 
-        PART2 = self.editPart2.text()
-        if (PART2.isdigit() == False):
+        try:
+            PART2 = float(self.editPart2.text())
+        except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 2')
             return
-        else:
-            PART2 = float(self.editPart2.text())
 
-        PART3 = self.editPart3.text()
-        if (PART3.isdigit() == False):
+        try:
+            PART3 = float(self.editPart3.text())
+        except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 3')
             return
-        else:
-            PART3 = float(self.editPart3.text())
 
-        PART4 = self.editPart4.text()
-        if (PART4.isdigit() == False):
+        try:
+            PART4 = float(self.editPart4.text())
+        except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 4')
             return
-        else:
-            PART4 = float(self.editPart4.text())
 
-        PART5 = self.editPart5.text()
-        if (PART5.isdigit() == False):
+        try:
+            PART5 = float(self.editPart5.text())
+        except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 5')
             return
-        else:
-            PART5 = float(self.editPart5.text())
+
+
 
         MVS_DIR = os.getenv('APPDATA') + '\CScalp\Visualizer\mvs_cs'
         root_src_dir = MVS_DIR
