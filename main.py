@@ -3,6 +3,7 @@ import sys, os, shutil, time, requests, math, psutil
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtGui
+from PyQt5 import QtCore
 
 import design
 
@@ -72,27 +73,11 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         else:
             self.listWidget.addItem('Ошибка! Файл config.ini не найден')
-            self.CODE_FTXFutures = ''
-            self.CODE_BinanceFutures = ''
-            self.editLeverage.setText('0')
-            self.editPart1.setText('0')
-            self.editPart2.setText('0')
-            self.editPart3.setText('0')
-            self.editPart4.setText('0')
-            self.editPart5.setText('0')
 
-        self.editCode.setText(self.CODE_FTXFutures)
-        self.editLeverage.setText(self.LEVERAGE_FTXFutures)
-        self.editPart1.setText(self.PART1_FTXFutures)
-        self.editPart2.setText(self.PART2_FTXFutures)
-        self.editPart3.setText(self.PART3_FTXFutures)
-        self.editPart4.setText(self.PART4_FTXFutures)
-        self.editPart5.setText(self.PART5_FTXFutures)
-        self.editDepo.setText(self.DEPO_FTXFutures)
-
-        self.comboBox.currentIndexChanged.connect(self.comboBoxChanged)
+        self.comboBoxChanged()
 
         # CONNECTIONS
+        self.comboBox.currentIndexChanged.connect(self.comboBoxChanged)
         self.editCode.textChanged.connect(self.editCodeChanged)
         self.editLeverage.textChanged.connect(self.editLeverageChanged)
         self.editPart1.textChanged.connect(self.editPart1Changed)
@@ -298,6 +283,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
 
     def updateAmounts(self):
+
+        self.setCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
         self.listWidget.clear()
 
         thereIsError = False
@@ -382,7 +369,14 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         if self.comboBox.currentIndex() == 0:
             ex_prefix = 'FTXD.FUT.'
             api_endpoint = "https://ftx.com/api/futures"
-            json_data = requests.get(api_endpoint).json()
+
+            try:
+                json_data = requests.get(api_endpoint).json()
+            except:
+                self.listWidget.addItem('Ошибка! Не удалось выполнить подключение к бирже.')
+                self.setCursor(QtGui.QCursor())
+                return
+
             depo = float(self.DEPO_FTXFutures) * float(self.LEVERAGE_FTXFutures)
 
             for item in json_data['result']:
@@ -405,8 +399,15 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             ex_prefix = 'BINAD.CCUR_FUT.'
             api_endpoint_exchange = "https://binance.com/fapi/v1/exchangeInfo"
             api_endpoint_premiumIndex = "https://binance.com/fapi/v1/premiumIndex"
-            json_data_exchange = requests.get(api_endpoint_exchange).json()
-            json_data_premiumIndex = requests.get(api_endpoint_premiumIndex).json()
+
+            try:
+                json_data_exchange = requests.get(api_endpoint_exchange).json()
+                json_data_premiumIndex = requests.get(api_endpoint_premiumIndex).json()
+            except:
+                self.listWidget.addItem('Ошибка! Не удалось выполнить подключение к бирже.')
+                self.setCursor(QtGui.QCursor())
+                return
+
             depo = float(self.DEPO_BinanceFutures) * float(self.LEVERAGE_BinanceFutures)
 
             for item in json_data_exchange['symbols']:
@@ -426,14 +427,17 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.listWidget.addItem(str(number_updated_files) + ' файлов обновлено')
         self.listWidget.addItem(str(number_skipped_tickers) + ' инструментов пропущено')
 
+        self.setCursor(QtGui.QCursor())
+
     def showDialog(self):
         QMessageBox.about(self, "О программе",
-                          "UpdateCScalpAmounts v0.1.2\n\nПрограмма подключается к бирже\n"
-                          "FTX (через /api/futures)\n"
-                          "Binance (через /fapi/v1/exchangeInfo и /fapi/v1/premiumIndex),\n"
-                          "где получает список инструментов и текущие цены лучшего бида.\n\nИсходя из цены инструмента, значений депозита, плеча и пропорций" +
+                          "UpdateCScalpAmounts v0.1.2\n\nПрограмма подключается к бирже FTX или Binance, "
+                          "где получает список инструментов с текущими ценами.\n\nИсходя из цены инструмента, значений депозита, плеча и пропорций" +
                           " расcчитываются объемы.\n\nДалее перезаписываются настройки стаканов в папке C:\\Users\\ИМЯ_ПОЛЬЗОВАТЕЛЯ\\AppData\\Roaming\\CScalp\\Visualizer\\mvs_cs - заменяются значения параметров First|Second|Third|Fourth|Fifth_WorkAmount. Перед перезаписью настройки стаканов сохраняются в папку backup.\n\n" +
-                          "В случае, если вы хотите оставить какие-то объемы нетронутыми, поставьте 0 в соответствующем поле.\n\nt.me/s1esarev\nL1FT@yandex.ru"
+                          "В случае, если вы хотите оставить какие-то объемы нетронутыми, поставьте 0 в соответствующем поле."
+                          "\n\n FTX\n/api/futures (цена bid)"
+                          "\n\nBinance\n/fapi/v1/exchangeInfo\n/fapi/v1/premiumIndex (цена markPrice)"
+                          "\n\nКонтакты:\nt.me/s1esarev\nL1FT@yandex.ru"
                           )
 
 
