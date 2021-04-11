@@ -14,7 +14,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(392, 363)
+        MainWindow.resize(374, 359)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/data/data/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setIconSize(QtCore.QSize(0, 0))
         MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         MainWindow.setDocumentMode(False)
@@ -41,6 +44,7 @@ class Ui_MainWindow(object):
         self.label_8.setObjectName("label_8")
         self.horizontalLayout_3.addWidget(self.label_8)
         self.editLeverage = QtWidgets.QLineEdit(self.centralwidget)
+        self.editLeverage.setEnabled(True)
         self.editLeverage.setMaxLength(200)
         self.editLeverage.setObjectName("editLeverage")
         self.horizontalLayout_3.addWidget(self.editLeverage)
@@ -128,6 +132,7 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "5"))
         self.pushButton.setText(_translate("MainWindow", "Обновить объемы"))
         self.pushButtonAbout.setText(_translate("MainWindow", "?"))
+import resources_rc
 
 
 if __name__ == "__main__":
