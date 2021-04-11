@@ -4,10 +4,10 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtGui
 
-import design  # Это наш конвертированный файл дизайна
+import design
+
 
 def my_round(var, size):
-    big_size = int(size) * 100000
     result = ((var * 100000) // (size * 100000)) * size
     if size >= 1:
         return math.floor(result)
@@ -16,17 +16,15 @@ def my_round(var, size):
 
 class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
     global CODE_FTXFutures
-    CODE_FTXFutures = ''
     global CODE_BinanceFutures
-    CODE_BinanceFutures = ''
 
     def __init__(self):
 
         super().__init__()
-        self.setupUi(self)  # Это нужно для инициализации нашего дизайна
+        self.setupUi(self)
 
         self.setWindowIcon(QtGui.QIcon('icon.ico'))
-        self.pushButton.clicked.connect(self.updateAmounts)  # Выполнить функцию browse_folder
+        self.pushButton.clicked.connect(self.updateAmounts)
         self.pushButtonAbout.clicked.connect(self.showDialog)
 
         self.listWidget.addItem('ВНИМАНИЕ! Закройте CScalp перед выполнением.')
@@ -38,9 +36,7 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         if os.path.exists('config.ini'):
             with open('config.ini', "r") as f:
-                data = f.read();
-
-                #self.editCode.setText(data.split('\n', 10)[0])
+                data = f.read()
                 self.CODE_FTXFutures = data.split('\n', 10)[0]
                 self.CODE_BinanceFutures = data.split('\n', 10)[1]
                 self.editLeverage.setText(data.split('\n', 10)[2])
@@ -52,8 +48,8 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 self.editDepo.setText(data.split('\n', 10)[8])
         else:
             self.listWidget.addItem('Ошибка! Файл config.ini не найден')
-            CODE_FTXFutures = ''
-            CODE_BinanceFutures = ''
+            self.CODE_FTXFutures = ''
+            self.CODE_BinanceFutures = ''
             self.editLeverage.setText('0')
             self.editPart1.setText('0')
             self.editPart2.setText('0')
@@ -67,13 +63,13 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.editCode.textChanged.connect(self.codeChanged)
 
     def codeChanged(self):
-        if (self.comboBox.currentIndex() == 0):
+        if self.comboBox.currentIndex() == 0:
             self.CODE_FTXFutures = self.editCode.text()
-        elif (self.comboBox.currentIndex() == 2):
+        elif self.comboBox.currentIndex() == 2:
             self.CODE_BinanceFutures = self.editCode.text()
 
     def comboBoxChanged(self):
-        self.listWidget.clear()  # На случай, если в списке уже есть элементы
+        self.listWidget.clear()
 
         if (self.comboBox.currentIndex() != 0) and (self.comboBox.currentIndex() != 2):
             self.listWidget.addItem('Режим [' + self.comboBox.currentText() + '] находится в разработке')
@@ -82,13 +78,13 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.listWidget.addItem('Установлен режим [' + self.comboBox.currentText() + ']')
             self.pushButton.setEnabled(True)
 
-        if (self.comboBox.currentIndex() == 0):
+        if self.comboBox.currentIndex() == 0:
             self.editCode.setText(self.CODE_FTXFutures)
 
-        if (self.comboBox.currentIndex() == 2):
+        if self.comboBox.currentIndex() == 2:
             self.editCode.setText(self.CODE_BinanceFutures)
 
-        if (self.comboBox.currentIndex() == 1)or((self.comboBox.currentIndex() == 3)):
+        if (self.comboBox.currentIndex() == 1) or (self.comboBox.currentIndex() == 3):
             self.editLeverage.setEnabled(False)
         else:
             self.editLeverage.setEnabled(True)
@@ -114,12 +110,12 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         Vol4 = my_round(volume_max * PART4 / 100, size)
         Vol5 = my_round(volume_max * PART5 / 100, size)
 
-        filename = ex_prefix + ticker + '_Settings_' + ACCOUNT_CODE + '.tmp';
-        fullname = MVS_DIR + '\\' + filename;
+        filename = ex_prefix + ticker + '_Settings_' + ACCOUNT_CODE + '.tmp'
+        fullname = MVS_DIR + '\\' + filename
         if os.path.exists(fullname):
 
             with open(fullname, "r") as f, open('temp.txt', "w") as f2:
-                lines = f.readlines();
+                lines = f.readlines()
 
                 for line in lines:
 
@@ -193,24 +189,26 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
 
     def updateAmounts(self):
-        self.listWidget.clear()  # На случай, если в списке уже есть элементы
+        self.listWidget.clear()
+
+        thereIsError = False
 
         for proc in psutil.process_iter():
             name = proc.name()
             if name == "CryptoScalp.exe":
                 self.listWidget.addItem('Ошибка! Запущен CScalp - выполнение невозможно.')
-                return
+                thereIsError = True
 
         try:
             depo = float(self.editDepo.text())
         except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение депозита')
-            return
+            thereIsError = True
 
-        LEVERAGE = self.editLeverage.text()
-        if (LEVERAGE.isdigit() == False):
+        LEVERAGE = 0
+        if not self.editLeverage.text().isdigit():
             self.listWidget.addItem('Ошибка! Некорректное значение плеча')
-            return
+            thereIsError = True
         else:
             LEVERAGE = float(self.editLeverage.text())
 
@@ -218,33 +216,34 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             PART1 = float(self.editPart1.text())
         except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 1')
-            return
+            thereIsError = True
 
         try:
             PART2 = float(self.editPart2.text())
         except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 2')
-            return
+            thereIsError = True
 
         try:
             PART3 = float(self.editPart3.text())
         except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 3')
-            return
+            thereIsError = True
 
         try:
             PART4 = float(self.editPart4.text())
         except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 4')
-            return
+            thereIsError = True
 
         try:
             PART5 = float(self.editPart5.text())
         except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение объема 5')
+            thereIsError = True
+
+        if thereIsError:
             return
-
-
 
         MVS_DIR = os.getenv('APPDATA') + '\CScalp\Visualizer\mvs_cs'
         root_src_dir = MVS_DIR
@@ -287,8 +286,6 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     PriceAggregationStep = 10
                     punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement));
 
-                    ACCOUNT_CODE = self.editCode.text()
-
                     if self.writeToFile(MVS_DIR, self.CODE_FTXFutures, ex_prefix, ticker, depo, price, size, PART1, PART2, PART3, PART4, PART5):
                         number_updated_files += 1
                     else:
@@ -297,8 +294,8 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         #  Binance Futures
         elif self.comboBox.currentIndex() == 2:
             ex_prefix = 'BINAD.CCUR_FUT.'
-            api_endpoint_exchange = "https://www.binance.com/fapi/v1/exchangeInfo"
-            api_endpoint_premiumIndex = "https://www.binance.com/fapi/v1/premiumIndex"
+            api_endpoint_exchange = "https://binance.com/fapi/v1/exchangeInfo"
+            api_endpoint_premiumIndex = "https://binance.com/fapi/v1/premiumIndex"
             json_data_exchange = requests.get(api_endpoint_exchange).json()
             json_data_premiumIndex = requests.get(api_endpoint_premiumIndex).json()
             depo = depo * LEVERAGE
@@ -323,7 +320,10 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     def showDialog(self):
         QMessageBox.about(self, "О программе",
-                          "UpdateCScalpAmounts v0.1.1\n\nПрограмма подключается к бирже через https://ftx.com/api/futures, где получает список инструментов и текущие цены лучшего бида.\n\nИсходя из цены инструмента, значений депозита, плеча и пропорций" +
+                          "UpdateCScalpAmounts v0.1.2\n\nПрограмма подключается к бирже\n"
+                          "FTX (/api/futures)\n"
+                          "Binance (/fapi/v1/exchangeInfo, /fapi/v1/premiumIndex),\n"
+                          "где получает список инструментов и текущие цены лучшего бида.\n\nИсходя из цены инструмента, значений депозита, плеча и пропорций" +
                           " расcчитываются объемы.\n\nДалее перезаписываются настройки стаканов в папке C:\\Users\\ИМЯ_ПОЛЬЗОВАТЕЛЯ\\AppData\\Roaming\\CScalp\\Visualizer\\mvs_cs - заменяются значения параметров First|Second|Third|Fourth|Fifth_WorkAmount. Перед перезаписью настройки стаканов сохраняются в папку backup.\n\n" +
                           "В случае, если вы хотите оставить какие-то объемы нетронутыми, поставьте 0 в соответствующем поле.\n\nt.me/s1esarev\nL1FT@yandex.ru"
                           )
