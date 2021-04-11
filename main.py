@@ -257,7 +257,7 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     # elif st.find('<HideFilteredTicks Value=')  != -1:
                     #     f2.write('    <HideFilteredTicks Value="True" />\n')
                     #
-                    # elif st.find('<PlaySoundOnTrade Value=')  != -1:
+                    # elif st.find('<PlaySoundOnTrade Value=')  != -1: 
                     #     f2.write('    <PlaySoundOnTrade Value="True" />\n')
 
                     else:
