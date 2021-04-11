@@ -15,6 +15,11 @@ def my_round(var, size):
         return math.floor(result * 100000) / 100000
 
 class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
+    global CODE_FTXFutures
+    CODE_FTXFutures = ''
+    global CODE_BinanceFutures
+    CODE_BinanceFutures = ''
+
     def __init__(self):
 
         super().__init__()
@@ -26,8 +31,6 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         self.listWidget.addItem('ВНИМАНИЕ! Закройте CScalp перед выполнением.')
 
-        self.comboBox.currentIndexChanged.connect(self.comboBoxChanged)
-
         self.comboBox.addItem('FTX: Бессрочные фьючерсы')
         self.comboBox.addItem('FTX: Спот')
         self.comboBox.addItem('Binance: Бессрочные фьючерсы')
@@ -37,17 +40,20 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             with open('config.ini', "r") as f:
                 data = f.read();
 
-                self.editCode.setText(data.split('\n', 10)[0])
-                self.editLeverage.setText(data.split('\n', 10)[1])
-                self.editPart1.setText(data.split('\n', 10)[2])
-                self.editPart2.setText(data.split('\n', 10)[3])
-                self.editPart3.setText(data.split('\n', 10)[4])
-                self.editPart4.setText(data.split('\n', 10)[5])
-                self.editPart5.setText(data.split('\n', 10)[6])
-                self.editDepo.setText(data.split('\n', 10)[7])
+                #self.editCode.setText(data.split('\n', 10)[0])
+                self.CODE_FTXFutures = data.split('\n', 10)[0]
+                self.CODE_BinanceFutures = data.split('\n', 10)[1]
+                self.editLeverage.setText(data.split('\n', 10)[2])
+                self.editPart1.setText(data.split('\n', 10)[3])
+                self.editPart2.setText(data.split('\n', 10)[4])
+                self.editPart3.setText(data.split('\n', 10)[5])
+                self.editPart4.setText(data.split('\n', 10)[6])
+                self.editPart5.setText(data.split('\n', 10)[7])
+                self.editDepo.setText(data.split('\n', 10)[8])
         else:
             self.listWidget.addItem('Ошибка! Файл config.ini не найден')
-            self.editCode.setText('0')
+            CODE_FTXFutures = ''
+            CODE_BinanceFutures = ''
             self.editLeverage.setText('0')
             self.editPart1.setText('0')
             self.editPart2.setText('0')
@@ -55,15 +61,32 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.editPart4.setText('0')
             self.editPart5.setText('0')
 
+        self.editCode.setText(self.CODE_FTXFutures)
+        print(self.CODE_BinanceFutures)
+        self.comboBox.currentIndexChanged.connect(self.comboBoxChanged)
+        self.editCode.textChanged.connect(self.codeChanged)
+
+    def codeChanged(self):
+        if (self.comboBox.currentIndex() == 0):
+            self.CODE_FTXFutures = self.editCode.text()
+        elif (self.comboBox.currentIndex() == 2):
+            self.CODE_BinanceFutures = self.editCode.text()
+
     def comboBoxChanged(self):
         self.listWidget.clear()  # На случай, если в списке уже есть элементы
 
-        if self.comboBox.currentIndex() != 0:
+        if (self.comboBox.currentIndex() != 0) and (self.comboBox.currentIndex() != 2):
             self.listWidget.addItem('Режим [' + self.comboBox.currentText() + '] находится в разработке')
             self.pushButton.setEnabled(False)
         else:
             self.listWidget.addItem('Установлен режим [' + self.comboBox.currentText() + ']')
             self.pushButton.setEnabled(True)
+
+        if (self.comboBox.currentIndex() == 0):
+            self.editCode.setText(self.CODE_FTXFutures)
+
+        if (self.comboBox.currentIndex() == 2):
+            self.editCode.setText(self.CODE_BinanceFutures)
 
         if (self.comboBox.currentIndex() == 1)or((self.comboBox.currentIndex() == 3)):
             self.editLeverage.setEnabled(False)
@@ -72,7 +95,8 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     def closeEvent(self, event):
         with open('config.ini', "w") as f:
-            f.write(self.editCode.text() + '\n')
+            f.write(self.CODE_FTXFutures + '\n')
+            f.write(self.CODE_BinanceFutures + '\n')
             f.write(self.editLeverage.text() + '\n')
             f.write(self.editPart1.text() + '\n')
             f.write(self.editPart2.text() + '\n')
@@ -80,6 +104,93 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             f.write(self.editPart4.text() + '\n')
             f.write(self.editPart5.text() + '\n')
             f.write(self.editDepo.text())
+
+    def writeToFile(self, MVS_DIR, ACCOUNT_CODE, ex_prefix, ticker, depo, price, size, PART1, PART2, PART3, PART4, PART5):
+        volume_max = float(depo) / float(price)
+        size = float(size)
+        Vol1 = my_round(volume_max * PART1 / 100, size)
+        Vol2 = my_round(volume_max * PART2 / 100, size)
+        Vol3 = my_round(volume_max * PART3 / 100, size)
+        Vol4 = my_round(volume_max * PART4 / 100, size)
+        Vol5 = my_round(volume_max * PART5 / 100, size)
+
+        filename = ex_prefix + ticker + '_Settings_' + ACCOUNT_CODE + '.tmp';
+        fullname = MVS_DIR + '\\' + filename;
+        if os.path.exists(fullname):
+
+            with open(fullname, "r") as f, open('temp.txt', "w") as f2:
+                lines = f.readlines();
+
+                for line in lines:
+
+                    st = str(line)
+
+                    if (st.find('<First_WorkAmount Value=') != -1) and (PART1 != 0):
+                        f2.write('    <First_WorkAmount Value="' + str(Vol1) + '" />\n')
+
+                    elif (st.find('<Second_WorkAmount Value=') != -1) and (PART2 != 0):
+                        f2.write('    <Second_WorkAmount Value="' + str(Vol2) + '" />\n')
+
+                    elif (st.find('<Third_WorkAmount Value=') != -1) and (PART3 != 0):
+                        f2.write('    <Third_WorkAmount Value="' + str(Vol3) + '" />\n')
+
+                    elif (st.find('<Fourth_WorkAmount Value=') != -1) and (PART4 != 0):
+                        f2.write('    <Fourth_WorkAmount Value="' + str(Vol4) + '" />\n')
+
+                    elif (st.find('<Fifth_WorkAmount Value=') != -1) and (PART5 != 0):
+                        f2.write('    <Fifth_WorkAmount Value="' + str(Vol5) + '" />\n')
+
+                    # elif st.find('<SlimLevelsFactor Value=')  != -1:
+                    #     f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
+                    #
+                    # elif st.find('<FatLevelsFactor Value=')  != -1:
+                    #     f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
+                    #
+                    # elif st.find('<SumTicks_Period Value=')  != -1:
+                    #     f2.write('    <SumTicks_Period Value="50" />\n')
+                    #
+                    # elif st.find('<HideFilteredTicks Value=')  != -1:
+                    #     f2.write('    <HideFilteredTicks Value="True" />\n')
+                    #
+                    # elif st.find('<PlaySoundOnTrade Value=')  != -1:
+                    #     f2.write('    <PlaySoundOnTrade Value="True" />\n')
+
+                    else:
+                        f2.write(line)
+
+            with open(fullname, "w") as f, open('temp.txt', "r") as f2:
+                new_data = f2.read()
+                f.write(new_data)
+
+            f.close()
+            f2.close()
+
+            if PART1 == 0:
+                Vol1 = 'X'
+
+            if PART2 == 0:
+                Vol2 = 'X'
+
+            if PART3 == 0:
+                Vol3 = 'X'
+
+            if PART4 == 0:
+                Vol4 = 'X'
+
+            if PART5 == 0:
+                Vol5 = 'X'
+
+            round_st = ticker + ' ($' + str(price) + ') ' + str(Vol1) + ' ' + str(Vol2) + ' ' + str(
+                Vol3) + ' ' + str(Vol4) + ' ' + str(Vol5)
+
+            self.listWidget.addItem(round_st)
+
+            return True
+
+        else:
+            self.listWidget.addItem('Файл с настройками для инструмента ' + ticker + ' не найден')
+            return False
+
 
     def updateAmounts(self):
         self.listWidget.clear()  # На случай, если в списке уже есть элементы
@@ -156,111 +267,56 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         self.listWidget.addItem('Сформирована резервная копия настроек: ' + root_dst_dir)
 
-        ex_prefix = 'FTXD.FUT.'
-
-        api_endpoint = "https://ftx.com/api/futures"
-        json_data = requests.get(api_endpoint).json()
-
-        depo = depo * LEVERAGE
-
         number_updated_files = 0
         number_skipped_tickers = 0
 
-        for item in json_data['result']:
-            if (item['expiryDescription'] == 'Perpetual'):
+        #  FTX Futures
+        if self.comboBox.currentIndex() == 0:
+            ex_prefix = 'FTXD.FUT.'
+            api_endpoint = "https://ftx.com/api/futures"
+            json_data = requests.get(api_endpoint).json()
+            depo = depo * LEVERAGE
 
-                ticker = item['name']
-                price = item['bid']
-                size = item['sizeIncrement']
-                priceIncrement = float(item['priceIncrement'])
+            for item in json_data['result']:
+                if (item['expiryDescription'] == 'Perpetual'):
 
-                PriceAggregationStep = 10
-                punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement));
+                    ticker = item['name']
+                    price = item['bid']
+                    size = item['sizeIncrement']
+                    priceIncrement = float(item['priceIncrement'])
+                    PriceAggregationStep = 10
+                    punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement));
 
-                volume_max = float(depo) / float(price)
-                Vol1 = my_round(volume_max * PART1 / 100, size)
-                Vol2 = my_round(volume_max * PART2 / 100, size)
-                Vol3 = my_round(volume_max * PART3 / 100, size)
-                Vol4 = my_round(volume_max * PART4 / 100, size)
-                Vol5 = my_round(volume_max * PART5 / 100, size)
+                    ACCOUNT_CODE = self.editCode.text()
 
-                ACCOUNT_CODE = self.editCode.text()
-                filename = ex_prefix + ticker + '_Settings_' + ACCOUNT_CODE + '.tmp';
-                fullname = MVS_DIR + '\\' + filename;
-                if os.path.exists(fullname):
+                    if self.writeToFile(MVS_DIR, self.CODE_FTXFutures, ex_prefix, ticker, depo, price, size, PART1, PART2, PART3, PART4, PART5):
+                        number_updated_files += 1
+                    else:
+                        number_skipped_tickers += 1
 
-                    with open(fullname, "r") as f, open('temp.txt', "w") as f2:
-                        lines = f.readlines();
+        #  Binance Futures
+        elif self.comboBox.currentIndex() == 2:
+            ex_prefix = 'BINAD.CCUR_FUT.'
+            api_endpoint_exchange = "https://www.binance.com/fapi/v1/exchangeInfo"
+            api_endpoint_premiumIndex = "https://www.binance.com/fapi/v1/premiumIndex"
+            json_data_exchange = requests.get(api_endpoint_exchange).json()
+            json_data_premiumIndex = requests.get(api_endpoint_premiumIndex).json()
+            depo = depo * LEVERAGE
+            ACCOUNT_CODE = self.editCode.text()
 
-                        for line in lines:
+            for item in json_data_exchange['symbols']:
+                ticker = item['symbol']
+                for filter in item['filters']:
+                    if filter['filterType'] == 'LOT_SIZE':
+                        size = filter['stepSize']
+                for item in json_data_premiumIndex:
+                    if item['symbol'] == ticker:
+                        price = item['markPrice']
 
-                            st = str(line)
-
-                            if (st.find('<First_WorkAmount Value=') != -1) and (PART1 != 0):
-                                f2.write('    <First_WorkAmount Value="' + str(Vol1) + '" />\n')
-
-                            elif (st.find('<Second_WorkAmount Value=') != -1) and (PART2 != 0):
-                                f2.write('    <Second_WorkAmount Value="' + str(Vol2) + '" />\n')
-
-                            elif (st.find('<Third_WorkAmount Value=') != -1) and (PART3 != 0):
-                                f2.write('    <Third_WorkAmount Value="' + str(Vol3) + '" />\n')
-
-                            elif (st.find('<Fourth_WorkAmount Value=') != -1) and (PART4 != 0):
-                                f2.write('    <Fourth_WorkAmount Value="' + str(Vol4) + '" />\n')
-
-                            elif (st.find('<Fifth_WorkAmount Value=') != -1) and (PART5 != 0):
-                                f2.write('    <Fifth_WorkAmount Value="' + str(Vol5) + '" />\n')
-
-                            # elif st.find('<SlimLevelsFactor Value=')  != -1:
-                            #     f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
-                            #
-                            # elif st.find('<FatLevelsFactor Value=')  != -1:
-                            #     f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
-                            #
-                            # elif st.find('<SumTicks_Period Value=')  != -1:
-                            #     f2.write('    <SumTicks_Period Value="50" />\n')
-                            #
-                            # elif st.find('<HideFilteredTicks Value=')  != -1:
-                            #     f2.write('    <HideFilteredTicks Value="True" />\n')
-                            #
-                            # elif st.find('<PlaySoundOnTrade Value=')  != -1:
-                            #     f2.write('    <PlaySoundOnTrade Value="True" />\n')
-
-                            else:
-                                f2.write(line)
-
-                    with open(fullname, "w") as f, open('temp.txt', "r") as f2:
-                        new_data = f2.read()
-                        f.write(new_data)
-
-                    f.close()
-                    f2.close()
-
-                    number_updated_files += 1
-
-                    if PART1 == 0:
-                        Vol1 = 'X'
-
-                    if PART2 == 0:
-                        Vol2 = 'X'
-
-                    if PART3 == 0:
-                        Vol3 = 'X'
-
-                    if PART4 == 0:
-                        Vol4 = 'X'
-
-                    if PART5 == 0:
-                        Vol5 = 'X'
-
-                    round_st = ticker + ' ($' + str(price) + ') ' + str(Vol1) + ' ' + str(Vol2) + ' ' + str(
-                        Vol3) + ' ' + str(Vol4) + ' ' + str(Vol5)
-                    self.listWidget.addItem(round_st)
-
-                else:
-
-                    self.listWidget.addItem('Файл с настройками для инструмента ' + ticker + ' не найден')
-                    number_skipped_tickers += 1
+                        if self.writeToFile(MVS_DIR, self.CODE_BinanceFutures, ex_prefix, ticker, depo, price, size, PART1, PART2, PART3, PART4, PART5):
+                            number_updated_files += 1
+                        else:
+                            number_skipped_tickers += 1
 
         self.listWidget.addItem(str(number_updated_files) + ' файлов обновлено')
         self.listWidget.addItem(str(number_skipped_tickers) + ' инструментов пропущено')
