@@ -14,7 +14,7 @@ def my_round(var, size):
     else:
         return math.floor(result * 100000) / 100000
 
-class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
+class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
     global CODE_FTXFutures
     global LEVERAGE_FTXFutures
     global DEPO_FTXFutures
@@ -257,7 +257,7 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     # elif st.find('<HideFilteredTicks Value=')  != -1:
                     #     f2.write('    <HideFilteredTicks Value="True" />\n')
                     #
-                    # elif st.find('<PlaySoundOnTrade Value=')  != -1: 
+                    # elif st.find('<PlaySoundOnTrade Value=')  != -1:
                     #     f2.write('    <PlaySoundOnTrade Value="True" />\n')
 
                     else:
@@ -393,7 +393,7 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     size = item['sizeIncrement']
                     priceIncrement = float(item['priceIncrement'])
                     PriceAggregationStep = 10
-                    punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement));
+                    punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
 
                     if self.writeToFile(MVS_DIR, self.CODE_FTXFutures, ex_prefix, ticker, depo, price, size, self.PART1_FTXFutures, self.PART2_FTXFutures, self.PART3_FTXFutures, self.PART4_FTXFutures, self.PART5_FTXFutures):
                         number_updated_files += 1
@@ -429,8 +429,8 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
     def showDialog(self):
         QMessageBox.about(self, "О программе",
                           "UpdateCScalpAmounts v0.1.2\n\nПрограмма подключается к бирже\n"
-                          "FTX (/api/futures)\n"
-                          "Binance (/fapi/v1/exchangeInfo, /fapi/v1/premiumIndex),\n"
+                          "FTX (через /api/futures)\n"
+                          "Binance (через /fapi/v1/exchangeInfo и /fapi/v1/premiumIndex),\n"
                           "где получает список инструментов и текущие цены лучшего бида.\n\nИсходя из цены инструмента, значений депозита, плеча и пропорций" +
                           " расcчитываются объемы.\n\nДалее перезаписываются настройки стаканов в папке C:\\Users\\ИМЯ_ПОЛЬЗОВАТЕЛЯ\\AppData\\Roaming\\CScalp\\Visualizer\\mvs_cs - заменяются значения параметров First|Second|Third|Fourth|Fifth_WorkAmount. Перед перезаписью настройки стаканов сохраняются в папку backup.\n\n" +
                           "В случае, если вы хотите оставить какие-то объемы нетронутыми, поставьте 0 в соответствующем поле.\n\nt.me/s1esarev\nL1FT@yandex.ru"
@@ -439,7 +439,7 @@ class ExampleApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
-    window = ExampleApp()  # Создаём объект класса ExampleApp
+    window = MyApp()
     window.show()  # Показываем окно
     app.exec_()  # и запускаем приложение
 
