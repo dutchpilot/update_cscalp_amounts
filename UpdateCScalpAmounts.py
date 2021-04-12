@@ -35,6 +35,16 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
     global PART4_BinanceFutures
     global PART5_BinanceFutures
 
+    global CODE_FTXSpot
+    global LEVERAGE_FTXSpot
+    global DEPO_FTXSpot
+    global CURRENCY_FTXSpot
+    global PART1_FTXSpot
+    global PART2_FTXSpot
+    global PART3_FTXSpot
+    global PART4_FTXSpot
+    global PART5_FTXSpot
+
     def __init__(self):
 
         super().__init__()
@@ -44,41 +54,59 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.pushButton.clicked.connect(self.updateAmounts)
         self.pushButtonAbout.clicked.connect(self.showDialog)
 
-        self.listWidget.addItem('ВНИМАНИЕ! Закройте CScalp перед выполнением.')
-
         self.comboBox.addItem('FTX: Бессрочные фьючерсы')
         self.comboBox.addItem('FTX: Спот')
         self.comboBox.addItem('Binance: Бессрочные фьючерсы')
         self.comboBox.addItem('Binance: Спот')
 
+        self.comboBoxCurrency.addItem('USD')
+        self.comboBoxCurrency.addItem('USDT')
+
         if os.path.exists('config.ini'):
             with open('config.ini', "r") as f:
                 data = f.read()
-                self.CODE_FTXFutures = data.split('\n', 20)[0]
-                self.LEVERAGE_FTXFutures = data.split('\n', 20)[1]
-                self.DEPO_FTXFutures = data.split('\n', 20)[2]
-                self.PART1_FTXFutures = data.split('\n', 20)[3]
-                self.PART2_FTXFutures = data.split('\n', 20)[4]
-                self.PART3_FTXFutures = data.split('\n', 20)[5]
-                self.PART4_FTXFutures = data.split('\n', 20)[6]
-                self.PART5_FTXFutures = data.split('\n', 20)[7]
+                self.CODE_FTXFutures = data.split('\n', 40)[0]
+                self.LEVERAGE_FTXFutures = data.split('\n', 40)[1]
+                self.DEPO_FTXFutures = data.split('\n', 40)[2]
+                self.PART1_FTXFutures = data.split('\n', 40)[3]
+                self.PART2_FTXFutures = data.split('\n', 40)[4]
+                self.PART3_FTXFutures = data.split('\n', 40)[5]
+                self.PART4_FTXFutures = data.split('\n', 40)[6]
+                self.PART5_FTXFutures = data.split('\n', 40)[7]
 
-                self.CODE_BinanceFutures = data.split('\n', 20)[8]
-                self.LEVERAGE_BinanceFutures = data.split('\n', 20)[9]
-                self.DEPO_BinanceFutures = data.split('\n', 20)[10]
-                self.PART1_BinanceFutures = data.split('\n', 20)[11]
-                self.PART2_BinanceFutures = data.split('\n', 20)[12]
-                self.PART3_BinanceFutures = data.split('\n', 20)[13]
-                self.PART4_BinanceFutures = data.split('\n', 20)[14]
-                self.PART5_BinanceFutures = data.split('\n', 20)[15]
+                self.CODE_BinanceFutures = data.split('\n', 40)[8]
+                self.LEVERAGE_BinanceFutures = data.split('\n', 40)[9]
+                self.DEPO_BinanceFutures = data.split('\n', 40)[10]
+                self.PART1_BinanceFutures = data.split('\n', 40)[11]
+                self.PART2_BinanceFutures = data.split('\n', 40)[12]
+                self.PART3_BinanceFutures = data.split('\n', 40)[13]
+                self.PART4_BinanceFutures = data.split('\n', 40)[14]
+                self.PART5_BinanceFutures = data.split('\n', 40)[15]
+
+                self.CODE_FTXSpot = data.split('\n', 40)[16]
+                self.LEVERAGE_FTXSpot = data.split('\n', 40)[17]
+                self.DEPO_FTXSpot = data.split('\n', 40)[18]
+                self.CURRENCY_FTXSpot = data.split('\n', 40)[19]
+                self.PART1_FTXSpot = data.split('\n', 40)[20]
+                self.PART2_FTXSpot = data.split('\n', 40)[21]
+                self.PART3_FTXSpot = data.split('\n', 40)[22]
+                self.PART4_FTXSpot = data.split('\n', 40)[23]
+                self.PART5_FTXSpot = data.split('\n', 40)[24]
 
         else:
             self.listWidget.addItem('Ошибка! Файл config.ini не найден')
 
         self.combobox_changed()
+        self.listWidget.addItem('ВНИМАНИЕ! Закройте CScalp перед выполнением.')
+
+        if self.CURRENCY_FTXSpot == 'USD':
+            self.comboBoxCurrency.setCurrentIndex(0)
+        elif self.CURRENCY_FTXSpot == 'USDT':
+            self.comboBoxCurrency.setCurrentIndex(1)
 
         # CONNECTIONS
         self.comboBox.currentIndexChanged.connect(self.combobox_changed)
+        self.comboBoxCurrency.currentIndexChanged.connect(self.combobox_currency_changed)
         self.editCode.textChanged.connect(self.edit_code_changed)
         self.editLeverage.textChanged.connect(self.edit_leverage_changed)
         self.editPart1.textChanged.connect(self.edit_part1_changed)
@@ -86,60 +114,81 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.editPart3.textChanged.connect(self.edit_part3_changed)
         self.editPart4.textChanged.connect(self.edit_part4_changed)
         self.editPart5.textChanged.connect(self.edit_part5_changed)
-        self.editDepo.textChanged.connect(self.edit_depo_changedd)
+        self.editDepo.textChanged.connect(self.edit_depo_changed)
 
     def edit_code_changed(self):
         if self.comboBox.currentIndex() == 0:
             self.CODE_FTXFutures = self.editCode.text()
+        elif self.comboBox.currentIndex() == 1:
+            self.CODE_FTXSpot = self.editCode.text()
         elif self.comboBox.currentIndex() == 2:
             self.CODE_BinanceFutures = self.editCode.text()
 
     def edit_leverage_changed(self):
         if self.comboBox.currentIndex() == 0:
             self.LEVERAGE_FTXFutures = self.editLeverage.text()
+        elif self.comboBox.currentIndex() == 1:
+            self.LEVERAGE_FTXSpot = self.editLeverage.text()
         elif self.comboBox.currentIndex() == 2:
             self.LEVERAGE_BinanceFutures = self.editLeverage.text()
 
-    def edit_depo_changedd(self):
+    def edit_depo_changed(self):
         if self.comboBox.currentIndex() == 0:
             self.DEPO_FTXFutures = self.editDepo.text()
+        elif self.comboBox.currentIndex() == 1:
+            self.DEPO_FTXSpot = self.editDepo.text()
         elif self.comboBox.currentIndex() == 2:
             self.DEPO_BinanceFutures = self.editDepo.text()
 
     def edit_part1_changed(self):
         if self.comboBox.currentIndex() == 0:
             self.PART1_FTXFutures = self.editPart1.text()
+        elif self.comboBox.currentIndex() == 1:
+            self.PART1_FTXSpot = self.editPart1.text()
         elif self.comboBox.currentIndex() == 2:
             self.PART1_BinanceFutures = self.editPart1.text()
 
     def edit_part2_changed(self):
         if self.comboBox.currentIndex() == 0:
             self.PART2_FTXFutures = self.editPart2.text()
+        elif self.comboBox.currentIndex() == 1:
+            self.PART2_FTXSpot = self.editPart2.text()
         elif self.comboBox.currentIndex() == 2:
             self.PART2_BinanceFutures = self.editPart2.text()
 
     def edit_part3_changed(self):
         if self.comboBox.currentIndex() == 0:
             self.PART3_FTXFutures = self.editPart3.text()
+        elif self.comboBox.currentIndex() == 1:
+            self.PART3_FTXSpot = self.editPart3.text()
         elif self.comboBox.currentIndex() == 2:
             self.PART3_BinanceFutures = self.editPart3.text()
 
     def edit_part4_changed(self):
         if self.comboBox.currentIndex() == 0:
             self.PART4_FTXFutures = self.editPart4.text()
+        elif self.comboBox.currentIndex() == 1:
+            self.PART4_FTXSpot = self.editPart4.text()
         elif self.comboBox.currentIndex() == 2:
             self.PART4_BinanceFutures = self.editPart4.text()
 
     def edit_part5_changed(self):
         if self.comboBox.currentIndex() == 0:
             self.PART5_FTXFutures = self.editPart5.text()
+        elif self.comboBox.currentIndex() == 1:
+            self.PART5_FTXSpot = self.editPart5.text()
         elif self.comboBox.currentIndex() == 2:
             self.PART5_BinanceFutures = self.editPart5.text()
 
+    def combobox_currency_changed(self):
+        self.CURRENCY_FTXSpot = self.comboBoxCurrency.currentText()
+
     def combobox_changed(self):
         self.listWidget.clear()
+        self.comboBoxCurrency.setVisible(False)
+        self.label_10.setVisible(False)
 
-        if (self.comboBox.currentIndex() != 0) and (self.comboBox.currentIndex() != 2):
+        if self.comboBox.currentIndex() == 3:
             self.listWidget.addItem('Режим [' + self.comboBox.currentText() + '] находится в разработке')
             self.pushButton.setEnabled(False)
         else:
@@ -155,6 +204,24 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.editPart4.setText(self.PART4_FTXFutures)
             self.editPart5.setText(self.PART5_FTXFutures)
             self.editDepo.setText(self.DEPO_FTXFutures)
+
+        elif self.comboBox.currentIndex() == 1:
+            self.editCode.setText(self.CODE_FTXSpot)
+            self.editLeverage.setText(self.LEVERAGE_FTXSpot)
+            self.editPart1.setText(self.PART1_FTXSpot)
+            self.editPart2.setText(self.PART2_FTXSpot)
+            self.editPart3.setText(self.PART3_FTXSpot)
+            self.editPart4.setText(self.PART4_FTXSpot)
+            self.editPart5.setText(self.PART5_FTXSpot)
+            self.editDepo.setText(self.DEPO_FTXSpot)
+
+            if self.CURRENCY_FTXSpot == 'USD':
+                self.comboBoxCurrency.setCurrentIndex(0)
+            elif self.CURRENCY_FTXSpot == 'USDT':
+                self.comboBoxCurrency.setCurrentIndex(1)
+
+            self.comboBoxCurrency.setVisible(True)
+            self.label_10.setVisible(True)
 
         elif self.comboBox.currentIndex() == 2:
             self.editCode.setText(self.CODE_BinanceFutures)
@@ -190,6 +257,16 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             f.write(self.PART3_BinanceFutures + '\n')
             f.write(self.PART4_BinanceFutures + '\n')
             f.write(self.PART5_BinanceFutures + '\n')
+
+            f.write(self.CODE_FTXSpot + '\n')
+            f.write(self.LEVERAGE_FTXSpot + '\n')
+            f.write(self.DEPO_FTXSpot + '\n')
+            f.write(self.CURRENCY_FTXSpot + '\n')
+            f.write(self.PART1_FTXSpot + '\n')
+            f.write(self.PART2_FTXSpot + '\n')
+            f.write(self.PART3_FTXSpot + '\n')
+            f.write(self.PART4_FTXSpot + '\n')
+            f.write(self.PART5_FTXSpot + '\n')
 
     def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, part1, part2, part3, part4, part5):
         volume_max = float(depo) / float(price)
@@ -295,7 +372,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             name = proc.name()
             if name == "CryptoScalp.exe":
                 self.listWidget.addItem('Ошибка! Запущен CScalp - выполнение невозможно.')
-                thereIsError = True
+                self.setCursor(QtGui.QCursor())
+                return
 
         try:
             depo = float(self.editDepo.text())
@@ -399,6 +477,38 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     else:
                         number_skipped_tickers += 1
 
+        #  FTX Spot
+        if self.comboBox.currentIndex() == 1:
+            ex_prefix = 'FTXD.SPOT.'
+            api_endpoint = "https://ftx.com/api/markets"
+
+            try:
+                json_data = requests.get(api_endpoint).json()
+            except:
+                self.listWidget.addItem('Ошибка! Не удалось выполнить подключение к бирже.')
+                self.setCursor(QtGui.QCursor())
+                return
+
+            depo = float(self.DEPO_FTXSpot)
+
+            for item in json_data['result']:
+                if (item['type'] == 'spot') and (item['name'].endswith(self.CURRENCY_FTXSpot)):
+
+                    ticker = item['name'].replace('/','')
+                    price = item['bid']
+                    size = item['sizeIncrement']
+                    priceIncrement = float(item['priceIncrement'])
+                    PriceAggregationStep = 10
+                    punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
+
+                    if self.write_to_file(MVS_DIR, self.CODE_FTXSpot, ex_prefix, ticker, depo, price, size,
+                                          self.PART1_FTXSpot, self.PART2_FTXSpot,
+                                          self.PART3_FTXSpot, self.PART4_FTXSpot,
+                                          self.PART5_FTXSpot):
+                        number_updated_files += 1
+                    else:
+                        number_skipped_tickers += 1
+
         #  Binance Futures
         elif self.comboBox.currentIndex() == 2:
             ex_prefix = 'BINAD.CCUR_FUT.'
@@ -439,7 +549,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     def showDialog(self):
         QMessageBox.about(self, "О программе",
-                          "UpdateCScalpAmounts v0.1.2\n\nПрограмма подключается к бирже FTX или Binance, "
+                          "UpdateCScalpAmounts v0.1.4\n\nПрограмма подключается к бирже FTX или Binance, "
                           "где получает список инструментов с текущими ценами.\n\nИсходя из цены "
                           "инструмента, значений депозита, плеча и пропорций" +
                           " расcчитываются объемы.\n\nДалее перезаписываются настройки стаканов в папке"
@@ -448,8 +558,9 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                           "Перед перезаписью настройки стаканов сохраняются в папку backup.\n\n" +
                           "В случае, если вы хотите оставить нетронутыми какие-то объемы в стаканах, то поставьте 0 "
                           "в соответствующем поле."
-                          "\n\n FTX\n/api/futures (цена bid)"
-                          "\n\nBinance\n/fapi/v1/exchangeInfo\n/fapi/v1/premiumIndex (цена markPrice)"
+                          "\n\n FTX: Бессрочные фьючерсы\n/api/futures (цена bid)"
+                          "\n\n FTX: Спот\n/api/markets (цена bid)"
+                          "\n\nBinance: Бессрочные фьючерсы\n/fapi/v1/exchangeInfo\n/fapi/v1/premiumIndex (цена markPrice)"
                           "\n\nКонтакты:\nt.me/s1esarev\nL1FT@yandex.ru"
                           )
 
