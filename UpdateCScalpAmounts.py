@@ -268,7 +268,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             f.write(self.PART4_FTXSpot + '\n')
             f.write(self.PART5_FTXSpot + '\n')
 
-    def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, part1, part2, part3, part4, part5):
+    def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, punkti, part1, part2, part3, part4, part5):
         volume_max = float(depo) / float(price)
         size = float(size)
         part1 = float(part1)
@@ -281,6 +281,9 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         vol3 = my_round(volume_max * part3 / 100, size)
         vol4 = my_round(volume_max * part4 / 100, size)
         vol5 = my_round(volume_max * part5 / 100, size)
+
+        dollars_ticks_from = 20000
+        show_ticks_from = round(dollars_ticks_from / float(price))
 
         filename = ex_prefix + ticker + '_Settings_' + account_code + '.tmp'
         fullname = mvs_dir + '\\' + filename
@@ -308,20 +311,23 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     elif (st.find('<Fifth_WorkAmount Value=') != -1) and (part5 != 0):
                         f2.write('    <Fifth_WorkAmount Value="' + str(vol5) + '" />\n')
 
-                    # elif st.find('<SlimLevelsFactor Value=')  != -1:
-                    #     f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
-                    #
-                    # elif st.find('<FatLevelsFactor Value=')  != -1:
-                    #     f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
-                    #
-                    # elif st.find('<SumTicks_Period Value=')  != -1:
-                    #     f2.write('    <SumTicks_Period Value="50" />\n')
-                    #
-                    # elif st.find('<HideFilteredTicks Value=')  != -1:
-                    #     f2.write('    <HideFilteredTicks Value="True" />\n')
-                    #
-                    # elif st.find('<PlaySoundOnTrade Value=')  != -1:
-                    #     f2.write('    <PlaySoundOnTrade Value="True" />\n')
+                    elif st.find('<SlimLevelsFactor Value=')  != -1:
+                        f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
+                    
+                    elif st.find('<FatLevelsFactor Value=')  != -1:
+                        f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
+                    
+                    elif st.find('<SumTicks_Period Value=')  != -1:
+                        f2.write('    <SumTicks_Period Value="500" />\n')
+                    
+                    elif st.find('<HideFilteredTicks Value=')  != -1:
+                        f2.write('    <HideFilteredTicks Value="True" />\n')
+                    
+                    elif st.find('<PlaySoundOnTrade Value=')  != -1:
+                        f2.write('    <PlaySoundOnTrade Value="True" />\n')
+
+                    elif st.find('<ShowTicksFrom Value=')  != -1:
+                        f2.write('    <ShowTicksFrom Value="' + str(show_ticks_from) + '" />\n')
 
                     else:
                         f2.write(line)
@@ -469,7 +475,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     PriceAggregationStep = 10
                     punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
 
-                    if self.write_to_file(MVS_DIR, self.CODE_FTXFutures, ex_prefix, ticker, depo, price, size,
+                    if self.write_to_file(MVS_DIR, self.CODE_FTXFutures, ex_prefix, ticker, depo, price, size, punkti,
                                           self.PART1_FTXFutures, self.PART2_FTXFutures,
                                           self.PART3_FTXFutures, self.PART4_FTXFutures,
                                           self.PART5_FTXFutures):
@@ -501,7 +507,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     PriceAggregationStep = 10
                     punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
 
-                    if self.write_to_file(MVS_DIR, self.CODE_FTXSpot, ex_prefix, ticker, depo, price, size,
+                    if self.write_to_file(MVS_DIR, self.CODE_FTXSpot, ex_prefix, ticker, depo, price, size, punkti,
                                           self.PART1_FTXSpot, self.PART2_FTXSpot,
                                           self.PART3_FTXSpot, self.PART4_FTXSpot,
                                           self.PART5_FTXSpot):
@@ -511,6 +517,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         #  Binance Futures
         elif self.comboBox.currentIndex() == 2:
+
             ex_prefix = 'BINAD.CCUR_FUT.'
             api_endpoint_exchange = "https://binance.com/fapi/v1/exchangeInfo"
             api_endpoint_premiumIndex = "https://binance.com/fapi/v1/premiumIndex"
@@ -534,7 +541,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     if item_prices['symbol'] == ticker:
                         price = item_prices['markPrice']
 
-                        if self.write_to_file(MVS_DIR, self.CODE_BinanceFutures, ex_prefix, ticker, depo, price, size,
+                        if self.write_to_file(MVS_DIR, self.CODE_BinanceFutures, ex_prefix, ticker, depo, price, size, 0,
                                               self.PART1_BinanceFutures, self.PART2_BinanceFutures,
                                               self.PART3_BinanceFutures, self.PART4_BinanceFutures,
                                               self.PART5_BinanceFutures):
