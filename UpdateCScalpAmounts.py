@@ -1,7 +1,7 @@
 import sys, os, shutil, time, requests, math, psutil
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
 from PyQt5 import QtGui
 from PyQt5 import QtCore
 
@@ -62,6 +62,18 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.comboBoxCurrency.addItem('USD')
         self.comboBoxCurrency.addItem('USDT')
 
+        self.tableWidget.setRowCount(0)
+        self.tableWidget.setColumnCount(7)
+        self.tableWidget.setHorizontalHeaderLabels(["Name", "Price", "V1", "V2", "V3 ", "V4", "V5"])
+        self.tableWidget.resizeColumnToContents(0)
+        self.tableWidget.resizeColumnToContents(1)
+        self.tableWidget.resizeColumnToContents(2)
+        self.tableWidget.resizeColumnToContents(3)
+        self.tableWidget.resizeColumnToContents(4)
+        self.tableWidget.resizeColumnToContents(5)
+        self.tableWidget.resizeColumnToContents(6)
+        self.change_mode()
+
         if os.path.exists('config.ini'):
             with open('config.ini', "r") as f:
                 data = f.read()
@@ -115,6 +127,19 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.editPart4.textChanged.connect(self.edit_part4_changed)
         self.editPart5.textChanged.connect(self.edit_part5_changed)
         self.editDepo.textChanged.connect(self.edit_depo_changed)
+        self.radioButton.toggled.connect(self.change_mode)
+        self.radioButton_2.toggled.connect(self.change_mode)
+
+    def change_mode(self):
+        if self.radioButton.isChecked():
+            self.listWidget.setVisible(False)
+            self.tableWidget.setVisible(True)
+            self.pushButton.setText('Рассчитать объемы')
+
+        if self.radioButton_2.isChecked():
+            self.listWidget.setVisible(True)
+            self.tableWidget.setVisible(False)
+            self.pushButton.setText('Обновить объемы в стаканах (Осторожно!)')
 
     def edit_code_changed(self):
         if self.comboBox.currentIndex() == 0:
@@ -268,7 +293,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             f.write(self.PART4_FTXSpot + '\n')
             f.write(self.PART5_FTXSpot + '\n')
 
-    def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, punkti, part1, part2, part3, part4, part5):
+    def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, punkti, part1, part2, part3, part4, part5, count_tickers):
         volume_max = float(depo) / float(price)
         size = float(size)
         part1 = float(part1)
@@ -285,92 +310,108 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         dollars_ticks_from = 20000
         show_ticks_from = round(dollars_ticks_from / float(price))
 
-        filename = ex_prefix + ticker + '_Settings_' + account_code + '.tmp'
-        fullname = mvs_dir + '\\' + filename
-        if os.path.exists(fullname):
+        self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
+        self.tableWidget.setItem(count_tickers - 1, 0, QTableWidgetItem(ticker))
+        self.tableWidget.setItem(count_tickers - 1, 1, QTableWidgetItem(str(price)))
+        self.tableWidget.setItem(count_tickers - 1, 2, QTableWidgetItem(str(vol1)))
+        self.tableWidget.setItem(count_tickers - 1, 3, QTableWidgetItem(str(vol2)))
+        self.tableWidget.setItem(count_tickers - 1, 4, QTableWidgetItem(str(vol3)))
+        self.tableWidget.setItem(count_tickers - 1, 5, QTableWidgetItem(str(vol4)))
+        self.tableWidget.setItem(count_tickers - 1, 6, QTableWidgetItem(str(vol5)))
 
-            with open(fullname, "r") as f, open('temp.txt', "w") as f2:
-                lines = f.readlines()
 
-                for line in lines:
+        if self.radioButton_2.isChecked():
+            filename = ex_prefix + ticker + '_Settings_' + account_code + '.tmp'
+            fullname = mvs_dir + '\\' + filename
+            if os.path.exists(fullname):
 
-                    st = str(line)
+                with open(fullname, "r") as f, open('temp.txt', "w") as f2:
+                    lines = f.readlines()
 
-                    if (st.find('<First_WorkAmount Value=') != -1) and (part1 != 0):
-                        f2.write('    <First_WorkAmount Value="' + str(vol1) + '" />\n')
+                    for line in lines:
 
-                    elif (st.find('<Second_WorkAmount Value=') != -1) and (part2 != 0):
-                        f2.write('    <Second_WorkAmount Value="' + str(vol2) + '" />\n')
+                        st = str(line)
 
-                    elif (st.find('<Third_WorkAmount Value=') != -1) and (part3 != 0):
-                        f2.write('    <Third_WorkAmount Value="' + str(vol3) + '" />\n')
+                        if (st.find('<First_WorkAmount Value=') != -1) and (part1 != 0):
+                            f2.write('    <First_WorkAmount Value="' + str(vol1) + '" />\n')
 
-                    elif (st.find('<Fourth_WorkAmount Value=') != -1) and (part4 != 0):
-                        f2.write('    <Fourth_WorkAmount Value="' + str(vol4) + '" />\n')
+                        elif (st.find('<Second_WorkAmount Value=') != -1) and (part2 != 0):
+                            f2.write('    <Second_WorkAmount Value="' + str(vol2) + '" />\n')
 
-                    elif (st.find('<Fifth_WorkAmount Value=') != -1) and (part5 != 0):
-                        f2.write('    <Fifth_WorkAmount Value="' + str(vol5) + '" />\n')
+                        elif (st.find('<Third_WorkAmount Value=') != -1) and (part3 != 0):
+                            f2.write('    <Third_WorkAmount Value="' + str(vol3) + '" />\n')
 
-                    elif st.find('<SlimLevelsFactor Value=')  != -1:
-                        f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
-                    
-                    elif st.find('<FatLevelsFactor Value=')  != -1:
-                        f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
-                    
-                    elif st.find('<SumTicks_Period Value=')  != -1:
-                        f2.write('    <SumTicks_Period Value="500" />\n')
-                    
-                    elif st.find('<HideFilteredTicks Value=')  != -1:
-                        f2.write('    <HideFilteredTicks Value="True" />\n')
-                    
-                    elif st.find('<PlaySoundOnTrade Value=')  != -1:
-                        f2.write('    <PlaySoundOnTrade Value="True" />\n')
+                        elif (st.find('<Fourth_WorkAmount Value=') != -1) and (part4 != 0):
+                            f2.write('    <Fourth_WorkAmount Value="' + str(vol4) + '" />\n')
 
-                    elif st.find('<ShowTicksFrom Value=')  != -1:
-                        f2.write('    <ShowTicksFrom Value="' + str(show_ticks_from) + '" />\n')
+                        elif (st.find('<Fifth_WorkAmount Value=') != -1) and (part5 != 0):
+                            f2.write('    <Fifth_WorkAmount Value="' + str(vol5) + '" />\n')
 
-                    else:
-                        f2.write(line)
+                        # elif st.find('<SlimLevelsFactor Value=')  != -1:
+                        #     f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
+                        #
+                        # elif st.find('<FatLevelsFactor Value=')  != -1:
+                        #     f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
+                        #
+                        # elif st.find('<SumTicks_Period Value=')  != -1:
+                        #     f2.write('    <SumTicks_Period Value="500" />\n')
+                        # #
+                        # elif st.find('<HideFilteredTicks Value=')  != -1:
+                        #     f2.write('    <HideFilteredTicks Value="True" />\n')
+                        #
+                        # elif st.find('<PlaySoundOnTrade Value=')  != -1:
+                        #     f2.write('    <PlaySoundOnTrade Value="True" />\n')
+                        # #
+                        # elif st.find('<ShowTicksFrom Value=')  != -1:
+                        #     f2.write('    <ShowTicksFrom Value="' + str(show_ticks_from) + '" />\n')
 
-            with open(fullname, "w") as f, open('temp.txt', "r") as f2:
-                new_data = f2.read()
-                f.write(new_data)
+                        else:
+                            f2.write(line)
 
-            f.close()
-            f2.close()
-            os.remove('temp.txt')
+                with open(fullname, "w") as f, open('temp.txt', "r") as f2:
+                    new_data = f2.read()
+                    f.write(new_data)
 
-            if part1 == 0:
-                vol1 = 'X'
+                f.close()
+                f2.close()
+                os.remove('temp.txt')
 
-            if part2 == 0:
-                vol2 = 'X'
+                if part1 == 0:
+                    vol1 = 'X'
 
-            if part3 == 0:
-                vol3 = 'X'
+                if part2 == 0:
+                    vol2 = 'X'
 
-            if part4 == 0:
-                vol4 = 'X'
+                if part3 == 0:
+                    vol3 = 'X'
 
-            if part5 == 0:
-                vol5 = 'X'
+                if part4 == 0:
+                    vol4 = 'X'
 
-            round_st = ticker + ' ($' + str(price) + ') ' + str(vol1) + ' ' + str(vol2) + ' ' + str(
-                vol3) + ' ' + str(vol4) + ' ' + str(vol5)
+                if part5 == 0:
+                    vol5 = 'X'
 
-            self.listWidget.addItem(round_st)
+                round_st = ticker + ' ($' + str(price) + ') ' + str(vol1) + ' ' + str(vol2) + ' ' + str(
+                    vol3) + ' ' + str(vol4) + ' ' + str(vol5)
 
-            return True
+                self.listWidget.addItem(round_st)
 
-        else:
-            self.listWidget.addItem('Файл с настройками для инструмента ' + ticker + ' не найден')
-            return False
+                return True
+
+            else:
+                self.listWidget.addItem('Файл с настройками для инструмента ' + ticker + ' не найден')
+                return False
 
 
     def updateAmounts(self):
 
         self.setCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
         self.listWidget.clear()
+        self.tableWidget.clear()
+        self.tableWidget.setColumnCount(7)
+        self.tableWidget.setHorizontalHeaderLabels(["Name", "Price", "V1", "V2", "V3", "V4", "V5"])
+        self.tableWidget.setRowCount(0)
+
 
         thereIsError = False
 
@@ -434,22 +475,24 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.listWidget.addItem('Текущее UNIX-время: ' + str(time.time()))
         self.listWidget.addItem('Каталог с настройками: ' + root_src_dir)
 
-        for src_dir, dirs, files in os.walk(root_src_dir):
-            dst_dir = src_dir.replace(root_src_dir, root_dst_dir, 1)
-            if not os.path.exists(dst_dir):
-                os.makedirs(dst_dir)
+        if self.radioButton_2.isChecked():
+            for src_dir, dirs, files in os.walk(root_src_dir):
+                dst_dir = src_dir.replace(root_src_dir, root_dst_dir, 1)
+                if not os.path.exists(dst_dir):
+                    os.makedirs(dst_dir)
 
-            for file_ in files:
-                src_file = os.path.join(src_dir, file_)
-                dst_file = os.path.join(dst_dir, file_)
-                if os.path.exists(dst_file):
-                    os.remove(dst_file)
-                shutil.copy(src_file, dst_dir)
+                for file_ in files:
+                    src_file = os.path.join(src_dir, file_)
+                    dst_file = os.path.join(dst_dir, file_)
+                    if os.path.exists(dst_file):
+                        os.remove(dst_file)
+                    shutil.copy(src_file, dst_dir)
 
-        self.listWidget.addItem('Сформирована резервная копия настроек: ' + root_dst_dir)
+            self.listWidget.addItem('Сформирована резервная копия настроек: ' + root_dst_dir)
 
         number_updated_files = 0
         number_skipped_tickers = 0
+        count_tickers = 0
 
         #  FTX Futures
         if self.comboBox.currentIndex() == 0:
@@ -475,10 +518,11 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     PriceAggregationStep = 10
                     punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
 
+                    count_tickers += 1
                     if self.write_to_file(MVS_DIR, self.CODE_FTXFutures, ex_prefix, ticker, depo, price, size, punkti,
                                           self.PART1_FTXFutures, self.PART2_FTXFutures,
                                           self.PART3_FTXFutures, self.PART4_FTXFutures,
-                                          self.PART5_FTXFutures):
+                                          self.PART5_FTXFutures, count_tickers):
                         number_updated_files += 1
                     else:
                         number_skipped_tickers += 1
@@ -507,10 +551,11 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     PriceAggregationStep = 10
                     punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
 
+                    count_tickers += 1
                     if self.write_to_file(MVS_DIR, self.CODE_FTXSpot, ex_prefix, ticker, depo, price, size, punkti,
                                           self.PART1_FTXSpot, self.PART2_FTXSpot,
                                           self.PART3_FTXSpot, self.PART4_FTXSpot,
-                                          self.PART5_FTXSpot):
+                                          self.PART5_FTXSpot, count_tickers):
                         number_updated_files += 1
                     else:
                         number_skipped_tickers += 1
@@ -541,10 +586,11 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     if item_prices['symbol'] == ticker:
                         price = item_prices['markPrice']
 
+                        count_tickers += 1
                         if self.write_to_file(MVS_DIR, self.CODE_BinanceFutures, ex_prefix, ticker, depo, price, size, 0,
                                               self.PART1_BinanceFutures, self.PART2_BinanceFutures,
                                               self.PART3_BinanceFutures, self.PART4_BinanceFutures,
-                                              self.PART5_BinanceFutures):
+                                              self.PART5_BinanceFutures, count_tickers):
                             number_updated_files += 1
                         else:
                             number_skipped_tickers += 1
@@ -552,14 +598,22 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.listWidget.addItem(str(number_updated_files) + ' файлов обновлено')
         self.listWidget.addItem(str(number_skipped_tickers) + ' инструментов пропущено')
 
+        self.tableWidget.resizeColumnToContents(0)
+        self.tableWidget.resizeColumnToContents(1)
+        self.tableWidget.resizeColumnToContents(2)
+        self.tableWidget.resizeColumnToContents(3)
+        self.tableWidget.resizeColumnToContents(4)
+        self.tableWidget.resizeColumnToContents(5)
+        self.tableWidget.resizeColumnToContents(6)
+
         self.setCursor(QtGui.QCursor())
 
     def showDialog(self):
         QMessageBox.about(self, "О программе",
-                          "UpdateCScalpAmounts v0.1.4\n\nПрограмма подключается к бирже FTX или Binance, "
+                          "UpdateCScalpAmounts v0.1.5\n\nПрограмма подключается к бирже FTX или Binance, "
                           "где получает список инструментов с текущими ценами.\n\nИсходя из цены "
                           "инструмента, значений депозита, плеча и пропорций" +
-                          " расcчитываются объемы.\n\nДалее перезаписываются настройки стаканов в папке"
+                          " расcчитываются объемы.\n\nНастройки стаканов перезаписываются в папке"
                           "\nC:\\Users\\ИМЯ_ПОЛЬЗОВАТЕЛЯ\\\nAppData\\Roaming\\CScalp\\Visualizer\\mvs_cs\n"
                           "В *.tmp-файлах заменяются значения параметров First|Second|Third|Fourth|Fifth_WorkAmount. "
                           "Перед перезаписью настройки стаканов сохраняются в папку backup.\n\n" +
