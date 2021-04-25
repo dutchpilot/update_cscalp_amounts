@@ -45,6 +45,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
     global PART4_FTXSpot
     global PART5_FTXSpot
 
+    global AMOUNTS_CAN_BE_EDITED
+
     def __init__(self):
 
         super().__init__()
@@ -57,7 +59,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.comboBox.addItem('FTX: Бессрочные фьючерсы')
         self.comboBox.addItem('FTX: Спот')
         self.comboBox.addItem('Binance: Бессрочные фьючерсы')
-        self.comboBox.addItem('Binance: Спот')
+        # self.comboBox.addItem('Binance: Спот')
 
         self.comboBoxCurrency.addItem('USD')
         self.comboBoxCurrency.addItem('USDT')
@@ -73,6 +75,36 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.tableWidget.resizeColumnToContents(5)
         self.tableWidget.resizeColumnToContents(6)
         self.change_mode()
+
+        self.CODE_FTXFutures = ''
+        self.LEVERAGE_FTXFutures = '20'
+        self.DEPO_FTXFutures = '0'
+        self.PART1_FTXFutures = '0'
+        self.PART2_FTXFutures = '0'
+        self.PART3_FTXFutures = '0'
+        self.PART4_FTXFutures = '0'
+        self.PART5_FTXFutures = '0'
+
+        self.CODE_BinanceFutures = ''
+        self.LEVERAGE_BinanceFutures = '1'
+        self.DEPO_BinanceFutures = '0'
+        self.PART1_BinanceFutures = '0'
+        self.PART2_BinanceFutures = '0'
+        self.PART3_BinanceFutures = '0'
+        self.PART4_BinanceFutures = '0'
+        self.PART5_BinanceFutures = '0'
+
+        self.CODE_FTXSpot = ''
+        self.LEVERAGE_FTXSpot = '1'
+        self.DEPO_FTXSpot = '0'
+        self.CURRENCY_FTXSpot = 'USD'
+        self.PART1_FTXSpot = '0'
+        self.PART2_FTXSpot = '0'
+        self.PART3_FTXSpot = '0'
+        self.PART4_FTXSpot = '0'
+        self.PART5_FTXSpot = '0'
+
+        self.AMOUNTS_CAN_BE_EDITED = ''
 
         if os.path.exists('config.ini'):
             with open('config.ini', "r") as f:
@@ -105,6 +137,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 self.PART4_FTXSpot = data.split('\n', 40)[23]
                 self.PART5_FTXSpot = data.split('\n', 40)[24]
 
+                self.AMOUNTS_CAN_BE_EDITED = data.split('\n', 40)[25]
+
         else:
             self.listWidget.addItem('Ошибка! Файл config.ini не найден')
 
@@ -130,16 +164,32 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.radioButton.toggled.connect(self.change_mode)
         self.radioButton_2.toggled.connect(self.change_mode)
 
+        if self.AMOUNTS_CAN_BE_EDITED == 'TRUE':
+            self.pushButton.setEnabled(True)
+            self.label_9.setVisible(True)
+            self.editCode.setVisible(True)
+            self.radioButton_2.setEnabled(True)
+        else:
+            self.pushButton.setEnabled(True)
+            self.label_9.setVisible(False)
+            self.editCode.setVisible(False)
+            self.radioButton_2.setEnabled(False)
+
     def change_mode(self):
         if self.radioButton.isChecked():
             self.listWidget.setVisible(False)
             self.tableWidget.setVisible(True)
             self.pushButton.setText('Рассчитать объемы')
+            self.pushButton.setEnabled(True)
 
         if self.radioButton_2.isChecked():
             self.listWidget.setVisible(True)
             self.tableWidget.setVisible(False)
             self.pushButton.setText('Обновить объемы в стаканах (Осторожно!)')
+            # if self.AMOUNTS_CAN_BE_EDITED == 'TRUE':
+            #     self.pushButton.setEnabled(True)
+            # else:
+            #     self.pushButton.setEnabled(False)
 
     def edit_code_changed(self):
         if self.comboBox.currentIndex() == 0:
@@ -293,6 +343,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             f.write(self.PART4_FTXSpot + '\n')
             f.write(self.PART5_FTXSpot + '\n')
 
+            f.write(self.AMOUNTS_CAN_BE_EDITED + '\n')
+
     def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, punkti, part1, part2, part3, part4, part5, count_tickers):
         volume_max = float(depo) / float(price)
         size = float(size)
@@ -415,12 +467,13 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         thereIsError = False
 
-        for proc in psutil.process_iter():
-            name = proc.name()
-            if name == "CryptoScalp.exe":
-                self.listWidget.addItem('Ошибка! Запущен CScalp - выполнение невозможно.')
-                self.setCursor(QtGui.QCursor())
-                return
+        if self.radioButton_2.isChecked():
+            for proc in psutil.process_iter():
+                name = proc.name()
+                if name == "CryptoScalp.exe":
+                    self.listWidget.addItem('Ошибка! Запущен CScalp - выполнение невозможно.')
+                    self.setCursor(QtGui.QCursor())
+                    return
 
         try:
             depo = float(self.editDepo.text())
@@ -466,6 +519,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             thereIsError = True
 
         if thereIsError:
+            self.setCursor(QtGui.QCursor())
             return
 
         MVS_DIR = os.getenv('APPDATA') + '\CScalp\Visualizer\mvs_cs'
@@ -550,7 +604,6 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     priceIncrement = float(item['priceIncrement'])
                     PriceAggregationStep = 10
                     punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
-
                     count_tickers += 1
                     if self.write_to_file(MVS_DIR, self.CODE_FTXSpot, ex_prefix, ticker, depo, price, size, punkti,
                                           self.PART1_FTXSpot, self.PART2_FTXSpot,
