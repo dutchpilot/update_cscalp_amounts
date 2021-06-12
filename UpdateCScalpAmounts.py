@@ -399,21 +399,24 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                         elif (st.find('<Fifth_WorkAmount Value=') != -1) and (part5 != 0):
                             f2.write('    <Fifth_WorkAmount Value="' + str(vol5) + '" />\n')
 
-                        # elif st.find('<SlimLevelsFactor Value=')  != -1:
-                        #     f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
-                        #
-                        # elif st.find('<FatLevelsFactor Value=')  != -1:
-                        #     f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
-                        #
+                        elif st.find('<SlimLevelsFactor Value=')  != -1:
+                            f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
+
+                        elif st.find('<RulerDataType Value=')  != -1:
+                            f2.write('    <RulerDataType Value="2" />\n')
+
+                        elif st.find('<FatLevelsFactor Value=')  != -1:
+                            f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
+
                         # elif st.find('<SumTicks_Period Value=')  != -1:
                         #     f2.write('    <SumTicks_Period Value="500" />\n')
-                        # #
+                        #
                         # elif st.find('<HideFilteredTicks Value=')  != -1:
-                        #     f2.write('    <HideFilteredTicks Value="True" />\n')
+                        #      f2.write('    <HideFilteredTicks Value="True" />\n')
                         #
                         # elif st.find('<PlaySoundOnTrade Value=')  != -1:
                         #     f2.write('    <PlaySoundOnTrade Value="True" />\n')
-                        # #
+
                         # elif st.find('<ShowTicksFrom Value=')  != -1:
                         #     f2.write('    <ShowTicksFrom Value="' + str(show_ticks_from) + '" />\n')
 
@@ -522,7 +525,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.setCursor(QtGui.QCursor())
             return
 
-        MVS_DIR = os.getenv('APPDATA') + '\CScalp\Visualizer\mvs_cs'
+        #MVS_DIR = os.getenv('APPDATA') + '\CScalp\Visualizer\mvs_cs'
+        MVS_DIR = 'C:\Program Files (x86)\FSR Launcher\SubApps\CScalp\Data\MVS'
         root_src_dir = MVS_DIR
         root_dst_dir = r'backup\backup ' + str(time.time())
 
@@ -603,7 +607,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     size = item['sizeIncrement']
                     priceIncrement = float(item['priceIncrement'])
                     PriceAggregationStep = 10
-                    punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
+                    punkti = math.ceil((price * 0.0007) / (1 * priceIncrement))
                     count_tickers += 1
                     if self.write_to_file(MVS_DIR, self.CODE_FTXSpot, ex_prefix, ticker, depo, price, size, punkti,
                                           self.PART1_FTXSpot, self.PART2_FTXSpot,
@@ -663,7 +667,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     def showDialog(self):
         QMessageBox.about(self, "О программе",
-                          "UpdateCScalpAmounts v0.1.5\n\nПрограмма подключается к бирже FTX или Binance, "
+                          "UpdateCScalpAmounts v0.1.6\n\nПрограмма подключается к бирже FTX или Binance, "
                           "где получает список инструментов с текущими ценами.\n\nИсходя из цены "
                           "инструмента, значений депозита, плеча и пропорций" +
                           " расcчитываются объемы.\n\nНастройки стаканов перезаписываются в папке"
