@@ -671,7 +671,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                           "где получает список инструментов с текущими ценами.\n\nИсходя из цены "
                           "инструмента, значений депозита, плеча и пропорций" +
                           " расcчитываются объемы.\n\nНастройки стаканов перезаписываются в папке"
-                          "\nC:\\Users\\ИМЯ_ПОЛЬЗОВАТЕЛЯ\\\nAppData\\Roaming\\CScalp\\Visualizer\\mvs_cs\n"
+                          "\nC:\\Program Files (x86)\\FSR Launcher\\SubApps\\CScalp\\Data\\MVS\n"
                           "В *.tmp-файлах заменяются значения параметров First|Second|Third|Fourth|Fifth_WorkAmount. "
                           "Перед перезаписью настройки стаканов сохраняются в папку backup.\n\n" +
                           "В случае, если вы хотите оставить нетронутыми какие-то объемы в стаканах, то поставьте 0 "
