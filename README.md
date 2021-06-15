@@ -13,4 +13,4 @@ FTX: Спот
 
 Binance: Бессрочные фьючерсы
 /fapi/v1/exchangeInfo
-fapi/v1/premiumIndex (цена markPrice)"
+fapi/v1/premiumIndex (цена markPrice)
