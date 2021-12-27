@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(523, 438)
+        MainWindow.resize(523, 441)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/data/data/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -29,6 +29,15 @@ class Ui_MainWindow(object):
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox.setObjectName("comboBox")
         self.verticalLayout.addWidget(self.comboBox)
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.label_11 = QtWidgets.QLabel(self.centralwidget)
+        self.label_11.setObjectName("label_11")
+        self.horizontalLayout_6.addWidget(self.label_11)
+        self.editPath = QtWidgets.QLineEdit(self.centralwidget)
+        self.editPath.setObjectName("editPath")
+        self.horizontalLayout_6.addWidget(self.editPath)
+        self.verticalLayout.addLayout(self.horizontalLayout_6)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
@@ -154,6 +163,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Обновление рабочих объемов в CScalp"))
+        self.label_11.setText(_translate("MainWindow", "Каталог CScalp"))
         self.label_7.setText(_translate("MainWindow", "Депозит в $"))
         self.label_8.setText(_translate("MainWindow", "Плечо"))
         self.label_9.setText(_translate("MainWindow", "Код подключения CScalp"))

@@ -45,6 +45,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
     global PART4_FTXSpot
     global PART5_FTXSpot
 
+    global CScalp_Path
+
     global AMOUNTS_CAN_BE_EDITED
 
     def __init__(self):
@@ -105,6 +107,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.PART5_FTXSpot = '0'
 
         self.AMOUNTS_CAN_BE_EDITED = ''
+        self.CScalp_Path = 'C:\Program Files (x86)\FSR Launcher'
 
         if os.path.exists('config.ini'):
             with open('config.ini', "r") as f:
@@ -139,10 +142,13 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
                 self.AMOUNTS_CAN_BE_EDITED = data.split('\n', 40)[25]
 
+                self.CScalp_Path = data.split('\n', 40)[26]
+
         else:
             self.listWidget.addItem('Ошибка! Файл config.ini не найден')
 
         self.combobox_changed()
+        self.editPath.setText(self.CScalp_Path)
         self.listWidget.addItem('ВНИМАНИЕ! Закройте CScalp перед выполнением.')
 
         if self.CURRENCY_FTXSpot == 'USD':
@@ -163,6 +169,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.editDepo.textChanged.connect(self.edit_depo_changed)
         self.radioButton.toggled.connect(self.change_mode)
         self.radioButton_2.toggled.connect(self.change_mode)
+        self.editPath.textChanged.connect(self.edit_path_changed)
 
         if self.AMOUNTS_CAN_BE_EDITED == 'TRUE':
             self.pushButton.setEnabled(True)
@@ -198,6 +205,10 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.CODE_FTXSpot = self.editCode.text()
         elif self.comboBox.currentIndex() == 2:
             self.CODE_BinanceFutures = self.editCode.text()
+
+    def edit_path_changed(self):
+        self.CScalp_Path = self.editPath.text()
+        print(self.CScalp_Path)
 
     def edit_leverage_changed(self):
         if self.comboBox.currentIndex() == 0:
@@ -345,6 +356,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
             f.write(self.AMOUNTS_CAN_BE_EDITED + '\n')
 
+            f.write(self.CScalp_Path + '\n')
+
     def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, punkti, part1, part2, part3, part4, part5, count_tickers):
         volume_max = float(depo) / float(price)
         size = float(size)
@@ -402,11 +415,11 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                         elif st.find('<SlimLevelsFactor Value=')  != -1:
                             f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
 
-                        elif st.find('<RulerDataType Value=')  != -1:
-                            f2.write('    <RulerDataType Value="2" />\n')
-
-                        elif st.find('<FatLevelsFactor Value=')  != -1:
-                            f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
+                        # elif st.find('<RulerDataType Value=')  != -1:
+                        #     f2.write('    <RulerDataType Value="2" />\n')
+                        #
+                        # elif st.find('<FatLevelsFactor Value=')  != -1:
+                        #     f2.write('    <FatLevelsFactor Value="'  + str(10*punkti) +'" />\n')
 
                         # elif st.find('<SumTicks_Period Value=')  != -1:
                         #     f2.write('    <SumTicks_Period Value="500" />\n')
@@ -526,7 +539,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             return
 
         #MVS_DIR = os.getenv('APPDATA') + '\CScalp\Visualizer\mvs_cs'
-        MVS_DIR = 'C:\Program Files (x86)\FSR Launcher\SubApps\CScalp\Data\MVS'
+        MVS_DIR = self.CScalp_Path + '\SubApps\CScalp\Data\MVS'
         root_src_dir = MVS_DIR
         root_dst_dir = r'backup\backup ' + str(time.time())
 
@@ -570,10 +583,14 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 if (item['expiryDescription'] == 'Perpetual'):
 
                     ticker = item['name']
+
+                    if ticker == 'DMG-PERP':
+                        continue
                     price = item['bid']
                     size = item['sizeIncrement']
                     priceIncrement = float(item['priceIncrement'])
                     PriceAggregationStep = 10
+                    punkti = 0.1
                     punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
 
                     count_tickers += 1
@@ -606,7 +623,6 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     price = item['bid']
                     size = item['sizeIncrement']
                     priceIncrement = float(item['priceIncrement'])
-                    PriceAggregationStep = 10
                     punkti = math.ceil((price * 0.0007) / (1 * priceIncrement))
                     count_tickers += 1
                     if self.write_to_file(MVS_DIR, self.CODE_FTXSpot, ex_prefix, ticker, depo, price, size, punkti,
