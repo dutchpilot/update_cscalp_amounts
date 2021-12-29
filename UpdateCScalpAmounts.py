@@ -6,6 +6,7 @@ from PyQt5 import QtGui
 from PyQt5 import QtCore
 
 import design
+import config
 
 
 def my_round(var, size):
@@ -17,38 +18,6 @@ def my_round(var, size):
 
 
 class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
-    global CODE_FTXFutures
-    global LEVERAGE_FTXFutures
-    global DEPO_FTXFutures
-    global PART1_FTXFutures
-    global PART2_FTXFutures
-    global PART3_FTXFutures
-    global PART4_FTXFutures
-    global PART5_FTXFutures
-
-    global CODE_BinanceFutures
-    global LEVERAGE_BinanceFutures
-    global DEPO_BinanceFutures
-    global PART1_BinanceFutures
-    global PART2_BinanceFutures
-    global PART3_BinanceFutures
-    global PART4_BinanceFutures
-    global PART5_BinanceFutures
-
-    global CODE_FTXSpot
-    global LEVERAGE_FTXSpot
-    global DEPO_FTXSpot
-    global CURRENCY_FTXSpot
-    global PART1_FTXSpot
-    global PART2_FTXSpot
-    global PART3_FTXSpot
-    global PART4_FTXSpot
-    global PART5_FTXSpot
-
-    global CScalp_Path
-
-    global AMOUNTS_CAN_BE_EDITED
-
     def __init__(self):
 
         super().__init__()
@@ -78,82 +47,51 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.tableWidget.resizeColumnToContents(6)
         self.change_mode()
 
-        self.CODE_FTXFutures = ''
-        self.LEVERAGE_FTXFutures = '20'
-        self.DEPO_FTXFutures = '0'
-        self.PART1_FTXFutures = '0'
-        self.PART2_FTXFutures = '0'
-        self.PART3_FTXFutures = '0'
-        self.PART4_FTXFutures = '0'
-        self.PART5_FTXFutures = '0'
-
-        self.CODE_BinanceFutures = ''
-        self.LEVERAGE_BinanceFutures = '1'
-        self.DEPO_BinanceFutures = '0'
-        self.PART1_BinanceFutures = '0'
-        self.PART2_BinanceFutures = '0'
-        self.PART3_BinanceFutures = '0'
-        self.PART4_BinanceFutures = '0'
-        self.PART5_BinanceFutures = '0'
-
-        self.CODE_FTXSpot = ''
-        self.LEVERAGE_FTXSpot = '1'
-        self.DEPO_FTXSpot = '0'
-        self.CURRENCY_FTXSpot = 'USD'
-        self.PART1_FTXSpot = '0'
-        self.PART2_FTXSpot = '0'
-        self.PART3_FTXSpot = '0'
-        self.PART4_FTXSpot = '0'
-        self.PART5_FTXSpot = '0'
-
-        self.AMOUNTS_CAN_BE_EDITED = ''
-        self.CScalp_Path = 'C:\Program Files (x86)\FSR Launcher'
-
         if os.path.exists('config.ini'):
             with open('config.ini', "r") as f:
                 data = f.read()
-                self.CODE_FTXFutures = data.split('\n', 40)[0]
-                self.LEVERAGE_FTXFutures = data.split('\n', 40)[1]
-                self.DEPO_FTXFutures = data.split('\n', 40)[2]
-                self.PART1_FTXFutures = data.split('\n', 40)[3]
-                self.PART2_FTXFutures = data.split('\n', 40)[4]
-                self.PART3_FTXFutures = data.split('\n', 40)[5]
-                self.PART4_FTXFutures = data.split('\n', 40)[6]
-                self.PART5_FTXFutures = data.split('\n', 40)[7]
+                config.CODE_FTXFutures = data.split('\n', 40)[0]
+                config.LEVERAGE_FTXFutures = data.split('\n', 40)[1]
+                config.DEPO_FTXFutures = data.split('\n', 40)[2]
+                config.PART1_FTXFutures = data.split('\n', 40)[3]
+                config.PART2_FTXFutures = data.split('\n', 40)[4]
+                config.PART3_FTXFutures = data.split('\n', 40)[5]
+                config.PART4_FTXFutures = data.split('\n', 40)[6]
+                config.PART5_FTXFutures = data.split('\n', 40)[7]
 
-                self.CODE_BinanceFutures = data.split('\n', 40)[8]
-                self.LEVERAGE_BinanceFutures = data.split('\n', 40)[9]
-                self.DEPO_BinanceFutures = data.split('\n', 40)[10]
-                self.PART1_BinanceFutures = data.split('\n', 40)[11]
-                self.PART2_BinanceFutures = data.split('\n', 40)[12]
-                self.PART3_BinanceFutures = data.split('\n', 40)[13]
-                self.PART4_BinanceFutures = data.split('\n', 40)[14]
-                self.PART5_BinanceFutures = data.split('\n', 40)[15]
+                config.CODE_BinanceFutures = data.split('\n', 40)[8]
+                config.LEVERAGE_BinanceFutures = data.split('\n', 40)[9]
+                config.DEPO_BinanceFutures = data.split('\n', 40)[10]
+                config.PART1_BinanceFutures = data.split('\n', 40)[11]
+                config.PART2_BinanceFutures = data.split('\n', 40)[12]
+                config.PART3_BinanceFutures = data.split('\n', 40)[13]
+                config.PART4_BinanceFutures = data.split('\n', 40)[14]
+                config.PART5_BinanceFutures = data.split('\n', 40)[15]
 
-                self.CODE_FTXSpot = data.split('\n', 40)[16]
-                self.LEVERAGE_FTXSpot = data.split('\n', 40)[17]
-                self.DEPO_FTXSpot = data.split('\n', 40)[18]
-                self.CURRENCY_FTXSpot = data.split('\n', 40)[19]
-                self.PART1_FTXSpot = data.split('\n', 40)[20]
-                self.PART2_FTXSpot = data.split('\n', 40)[21]
-                self.PART3_FTXSpot = data.split('\n', 40)[22]
-                self.PART4_FTXSpot = data.split('\n', 40)[23]
-                self.PART5_FTXSpot = data.split('\n', 40)[24]
+                config.CODE_FTXSpot = data.split('\n', 40)[16]
+                config.LEVERAGE_FTXSpot = data.split('\n', 40)[17]
+                config.DEPO_FTXSpot = data.split('\n', 40)[18]
+                config.CURRENCY_FTXSpot = data.split('\n', 40)[19]
+                config.PART1_FTXSpot = data.split('\n', 40)[20]
+                config.PART2_FTXSpot = data.split('\n', 40)[21]
+                config.PART3_FTXSpot = data.split('\n', 40)[22]
+                config.PART4_FTXSpot = data.split('\n', 40)[23]
+                config.PART5_FTXSpot = data.split('\n', 40)[24]
 
-                self.AMOUNTS_CAN_BE_EDITED = data.split('\n', 40)[25]
+                config.AMOUNTS_CAN_BE_EDITED = data.split('\n', 40)[25]
 
-                self.CScalp_Path = data.split('\n', 40)[26]
+                config.CSCALP_PATH = data.split('\n', 40)[26]
 
         else:
             self.listWidget.addItem('Ошибка! Файл config.ini не найден')
 
         self.combobox_changed()
-        self.editPath.setText(self.CScalp_Path)
+        self.editPath.setText(config.CSCALP_PATH)
         self.listWidget.addItem('ВНИМАНИЕ! Закройте CScalp перед выполнением.')
 
-        if self.CURRENCY_FTXSpot == 'USD':
+        if config.CURRENCY_FTXSpot == 'USD':
             self.comboBoxCurrency.setCurrentIndex(0)
-        elif self.CURRENCY_FTXSpot == 'USDT':
+        elif config.CURRENCY_FTXSpot == 'USDT':
             self.comboBoxCurrency.setCurrentIndex(1)
 
         # CONNECTIONS
@@ -171,7 +109,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.radioButton_2.toggled.connect(self.change_mode)
         self.editPath.textChanged.connect(self.edit_path_changed)
 
-        if self.AMOUNTS_CAN_BE_EDITED == 'TRUE':
+        if config.AMOUNTS_CAN_BE_EDITED == 'TRUE':
             self.pushButton.setEnabled(True)
             self.label_9.setVisible(True)
             self.editCode.setVisible(True)
@@ -200,74 +138,74 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     def edit_code_changed(self):
         if self.comboBox.currentIndex() == 0:
-            self.CODE_FTXFutures = self.editCode.text()
+            config.CODE_FTXFutures = self.editCode.text()
         elif self.comboBox.currentIndex() == 1:
-            self.CODE_FTXSpot = self.editCode.text()
+            config.CODE_FTXSpot = self.editCode.text()
         elif self.comboBox.currentIndex() == 2:
-            self.CODE_BinanceFutures = self.editCode.text()
+            config.CODE_BinanceFutures = self.editCode.text()
 
     def edit_path_changed(self):
-        self.CScalp_Path = self.editPath.text()
-        print(self.CScalp_Path)
+        config.CSCALP_PATH = self.editPath.text()
+        print(config.CSCALP_PATH)
 
     def edit_leverage_changed(self):
         if self.comboBox.currentIndex() == 0:
-            self.LEVERAGE_FTXFutures = self.editLeverage.text()
+            config.LEVERAGE_FTXFutures = self.editLeverage.text()
         elif self.comboBox.currentIndex() == 1:
-            self.LEVERAGE_FTXSpot = self.editLeverage.text()
+            config.LEVERAGE_FTXSpot = self.editLeverage.text()
         elif self.comboBox.currentIndex() == 2:
-            self.LEVERAGE_BinanceFutures = self.editLeverage.text()
+            config.LEVERAGE_BinanceFutures = self.editLeverage.text()
 
     def edit_depo_changed(self):
         if self.comboBox.currentIndex() == 0:
-            self.DEPO_FTXFutures = self.editDepo.text()
+            config.DEPO_FTXFutures = self.editDepo.text()
         elif self.comboBox.currentIndex() == 1:
-            self.DEPO_FTXSpot = self.editDepo.text()
+            config.DEPO_FTXSpot = self.editDepo.text()
         elif self.comboBox.currentIndex() == 2:
-            self.DEPO_BinanceFutures = self.editDepo.text()
+            config.DEPO_BinanceFutures = self.editDepo.text()
 
     def edit_part1_changed(self):
         if self.comboBox.currentIndex() == 0:
-            self.PART1_FTXFutures = self.editPart1.text()
+            config.PART1_FTXFutures = self.editPart1.text()
         elif self.comboBox.currentIndex() == 1:
-            self.PART1_FTXSpot = self.editPart1.text()
+            config.PART1_FTXSpot = self.editPart1.text()
         elif self.comboBox.currentIndex() == 2:
-            self.PART1_BinanceFutures = self.editPart1.text()
+            config.PART1_BinanceFutures = self.editPart1.text()
 
     def edit_part2_changed(self):
         if self.comboBox.currentIndex() == 0:
-            self.PART2_FTXFutures = self.editPart2.text()
+            config.PART2_FTXFutures = self.editPart2.text()
         elif self.comboBox.currentIndex() == 1:
-            self.PART2_FTXSpot = self.editPart2.text()
+            config.PART2_FTXSpot = self.editPart2.text()
         elif self.comboBox.currentIndex() == 2:
-            self.PART2_BinanceFutures = self.editPart2.text()
+            config.PART2_BinanceFutures = self.editPart2.text()
 
     def edit_part3_changed(self):
         if self.comboBox.currentIndex() == 0:
-            self.PART3_FTXFutures = self.editPart3.text()
+            config.PART3_FTXFutures = self.editPart3.text()
         elif self.comboBox.currentIndex() == 1:
-            self.PART3_FTXSpot = self.editPart3.text()
+            config.PART3_FTXSpot = self.editPart3.text()
         elif self.comboBox.currentIndex() == 2:
-            self.PART3_BinanceFutures = self.editPart3.text()
+            config.PART3_BinanceFutures = self.editPart3.text()
 
     def edit_part4_changed(self):
         if self.comboBox.currentIndex() == 0:
-            self.PART4_FTXFutures = self.editPart4.text()
+            config.PART4_FTXFutures = self.editPart4.text()
         elif self.comboBox.currentIndex() == 1:
-            self.PART4_FTXSpot = self.editPart4.text()
+            config.PART4_FTXSpot = self.editPart4.text()
         elif self.comboBox.currentIndex() == 2:
-            self.PART4_BinanceFutures = self.editPart4.text()
+            config.PART4_BinanceFutures = self.editPart4.text()
 
     def edit_part5_changed(self):
         if self.comboBox.currentIndex() == 0:
-            self.PART5_FTXFutures = self.editPart5.text()
+            config.PART5_FTXFutures = self.editPart5.text()
         elif self.comboBox.currentIndex() == 1:
-            self.PART5_FTXSpot = self.editPart5.text()
+            config.PART5_FTXSpot = self.editPart5.text()
         elif self.comboBox.currentIndex() == 2:
-            self.PART5_BinanceFutures = self.editPart5.text()
+            config.PART5_BinanceFutures = self.editPart5.text()
 
     def combobox_currency_changed(self):
-        self.CURRENCY_FTXSpot = self.comboBoxCurrency.currentText()
+        config.CURRENCY_FTXSpot = self.comboBoxCurrency.currentText()
 
     def combobox_changed(self):
         self.listWidget.clear()
@@ -282,42 +220,42 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.pushButton.setEnabled(True)
 
         if self.comboBox.currentIndex() == 0:
-            self.editCode.setText(self.CODE_FTXFutures)
-            self.editLeverage.setText(self.LEVERAGE_FTXFutures)
-            self.editPart1.setText(self.PART1_FTXFutures)
-            self.editPart2.setText(self.PART2_FTXFutures)
-            self.editPart3.setText(self.PART3_FTXFutures)
-            self.editPart4.setText(self.PART4_FTXFutures)
-            self.editPart5.setText(self.PART5_FTXFutures)
-            self.editDepo.setText(self.DEPO_FTXFutures)
+            self.editCode.setText(config.CODE_FTXFutures)
+            self.editLeverage.setText(config.LEVERAGE_FTXFutures)
+            self.editPart1.setText(config.PART1_FTXFutures)
+            self.editPart2.setText(config.PART2_FTXFutures)
+            self.editPart3.setText(config.PART3_FTXFutures)
+            self.editPart4.setText(config.PART4_FTXFutures)
+            self.editPart5.setText(config.PART5_FTXFutures)
+            self.editDepo.setText(config.DEPO_FTXFutures)
 
         elif self.comboBox.currentIndex() == 1:
-            self.editCode.setText(self.CODE_FTXSpot)
-            self.editLeverage.setText(self.LEVERAGE_FTXSpot)
-            self.editPart1.setText(self.PART1_FTXSpot)
-            self.editPart2.setText(self.PART2_FTXSpot)
-            self.editPart3.setText(self.PART3_FTXSpot)
-            self.editPart4.setText(self.PART4_FTXSpot)
-            self.editPart5.setText(self.PART5_FTXSpot)
-            self.editDepo.setText(self.DEPO_FTXSpot)
+            self.editCode.setText(config.CODE_FTXSpot)
+            self.editLeverage.setText(config.LEVERAGE_FTXSpot)
+            self.editPart1.setText(config.PART1_FTXSpot)
+            self.editPart2.setText(config.PART2_FTXSpot)
+            self.editPart3.setText(config.PART3_FTXSpot)
+            self.editPart4.setText(config.PART4_FTXSpot)
+            self.editPart5.setText(config.PART5_FTXSpot)
+            self.editDepo.setText(config.DEPO_FTXSpot)
 
-            if self.CURRENCY_FTXSpot == 'USD':
+            if config.CURRENCY_FTXSpot == 'USD':
                 self.comboBoxCurrency.setCurrentIndex(0)
-            elif self.CURRENCY_FTXSpot == 'USDT':
+            elif config.CURRENCY_FTXSpot == 'USDT':
                 self.comboBoxCurrency.setCurrentIndex(1)
 
             self.comboBoxCurrency.setVisible(True)
             self.label_10.setVisible(True)
 
         elif self.comboBox.currentIndex() == 2:
-            self.editCode.setText(self.CODE_BinanceFutures)
-            self.editLeverage.setText(self.LEVERAGE_BinanceFutures)
-            self.editPart1.setText(self.PART1_BinanceFutures)
-            self.editPart2.setText(self.PART2_BinanceFutures)
-            self.editPart3.setText(self.PART3_BinanceFutures)
-            self.editPart4.setText(self.PART4_BinanceFutures)
-            self.editPart5.setText(self.PART5_BinanceFutures)
-            self.editDepo.setText(self.DEPO_BinanceFutures)
+            self.editCode.setText(config.CODE_BinanceFutures)
+            self.editLeverage.setText(config.LEVERAGE_BinanceFutures)
+            self.editPart1.setText(config.PART1_BinanceFutures)
+            self.editPart2.setText(config.PART2_BinanceFutures)
+            self.editPart3.setText(config.PART3_BinanceFutures)
+            self.editPart4.setText(config.PART4_BinanceFutures)
+            self.editPart5.setText(config.PART5_BinanceFutures)
+            self.editDepo.setText(config.DEPO_BinanceFutures)
 
         if (self.comboBox.currentIndex() == 1) or (self.comboBox.currentIndex() == 3):
             self.editLeverage.setEnabled(False)
@@ -326,37 +264,37 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     def closeEvent(self, event):
         with open('config.ini', "w") as f:
-            f.write(self.CODE_FTXFutures + '\n')
-            f.write(self.LEVERAGE_FTXFutures + '\n')
-            f.write(self.DEPO_FTXFutures + '\n')
-            f.write(self.PART1_FTXFutures + '\n')
-            f.write(self.PART2_FTXFutures + '\n')
-            f.write(self.PART3_FTXFutures + '\n')
-            f.write(self.PART4_FTXFutures + '\n')
-            f.write(self.PART5_FTXFutures + '\n')
+            f.write(config.CODE_FTXFutures + '\n')
+            f.write(config.LEVERAGE_FTXFutures + '\n')
+            f.write(config.DEPO_FTXFutures + '\n')
+            f.write(config.PART1_FTXFutures + '\n')
+            f.write(config.PART2_FTXFutures + '\n')
+            f.write(config.PART3_FTXFutures + '\n')
+            f.write(config.PART4_FTXFutures + '\n')
+            f.write(config.PART5_FTXFutures + '\n')
 
-            f.write(self.CODE_BinanceFutures + '\n')
-            f.write(self.LEVERAGE_BinanceFutures + '\n')
-            f.write(self.DEPO_BinanceFutures + '\n')
-            f.write(self.PART1_BinanceFutures + '\n')
-            f.write(self.PART2_BinanceFutures + '\n')
-            f.write(self.PART3_BinanceFutures + '\n')
-            f.write(self.PART4_BinanceFutures + '\n')
-            f.write(self.PART5_BinanceFutures + '\n')
+            f.write(config.CODE_BinanceFutures + '\n')
+            f.write(config.LEVERAGE_BinanceFutures + '\n')
+            f.write(config.DEPO_BinanceFutures + '\n')
+            f.write(config.PART1_BinanceFutures + '\n')
+            f.write(config.PART2_BinanceFutures + '\n')
+            f.write(config.PART3_BinanceFutures + '\n')
+            f.write(config.PART4_BinanceFutures + '\n')
+            f.write(config.PART5_BinanceFutures + '\n')
 
-            f.write(self.CODE_FTXSpot + '\n')
-            f.write(self.LEVERAGE_FTXSpot + '\n')
-            f.write(self.DEPO_FTXSpot + '\n')
-            f.write(self.CURRENCY_FTXSpot + '\n')
-            f.write(self.PART1_FTXSpot + '\n')
-            f.write(self.PART2_FTXSpot + '\n')
-            f.write(self.PART3_FTXSpot + '\n')
-            f.write(self.PART4_FTXSpot + '\n')
-            f.write(self.PART5_FTXSpot + '\n')
+            f.write(config.CODE_FTXSpot + '\n')
+            f.write(config.LEVERAGE_FTXSpot + '\n')
+            f.write(config.DEPO_FTXSpot + '\n')
+            f.write(config.CURRENCY_FTXSpot + '\n')
+            f.write(config.PART1_FTXSpot + '\n')
+            f.write(config.PART2_FTXSpot + '\n')
+            f.write(config.PART3_FTXSpot + '\n')
+            f.write(config.PART4_FTXSpot + '\n')
+            f.write(config.PART5_FTXSpot + '\n')
 
-            f.write(self.AMOUNTS_CAN_BE_EDITED + '\n')
+            f.write(config.AMOUNTS_CAN_BE_EDITED + '\n')
 
-            f.write(self.CScalp_Path + '\n')
+            f.write(config.CSCALP_PATH + '\n')
 
     def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, punkti, part1, part2, part3, part4, part5, count_tickers):
         volume_max = float(depo) / float(price)
@@ -412,8 +350,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                         elif (st.find('<Fifth_WorkAmount Value=') != -1) and (part5 != 0):
                             f2.write('    <Fifth_WorkAmount Value="' + str(vol5) + '" />\n')
 
-                        elif st.find('<SlimLevelsFactor Value=')  != -1:
-                            f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
+                        # elif st.find('<SlimLevelsFactor Value=')  != -1:
+                        #     f2.write('    <SlimLevelsFactor Value="'  + str(1*punkti) +'" />\n')
 
                         # elif st.find('<RulerDataType Value=')  != -1:
                         #     f2.write('    <RulerDataType Value="2" />\n')
@@ -539,7 +477,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             return
 
         #MVS_DIR = os.getenv('APPDATA') + '\CScalp\Visualizer\mvs_cs'
-        MVS_DIR = self.CScalp_Path + '\SubApps\CScalp\Data\MVS'
+        MVS_DIR = config.CSCALP_PATH + '\SubApps\CScalp\Data\MVS'
         root_src_dir = MVS_DIR
         root_dst_dir = r'backup\backup ' + str(time.time())
 
@@ -577,13 +515,12 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 self.setCursor(QtGui.QCursor())
                 return
 
-            depo = float(self.DEPO_FTXFutures) * float(self.LEVERAGE_FTXFutures)
+            depo = float(config.DEPO_FTXFutures) * float(config.LEVERAGE_FTXFutures)
 
             for item in json_data['result']:
                 if (item['expiryDescription'] == 'Perpetual'):
 
                     ticker = item['name']
-
                     if ticker == 'DMG-PERP':
                         continue
                     price = item['bid']
@@ -594,10 +531,10 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
 
                     count_tickers += 1
-                    if self.write_to_file(MVS_DIR, self.CODE_FTXFutures, ex_prefix, ticker, depo, price, size, punkti,
-                                          self.PART1_FTXFutures, self.PART2_FTXFutures,
-                                          self.PART3_FTXFutures, self.PART4_FTXFutures,
-                                          self.PART5_FTXFutures, count_tickers):
+                    if self.write_to_file(MVS_DIR, config.CODE_FTXFutures, ex_prefix, ticker, depo, price, size, punkti,
+                                          config.PART1_FTXFutures, config.PART2_FTXFutures,
+                                          config.PART3_FTXFutures, config.PART4_FTXFutures,
+                                          config.PART5_FTXFutures, count_tickers):
                         number_updated_files += 1
                     else:
                         number_skipped_tickers += 1
@@ -614,10 +551,10 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 self.setCursor(QtGui.QCursor())
                 return
 
-            depo = float(self.DEPO_FTXSpot)
+            depo = float(config.DEPO_FTXSpot)
 
             for item in json_data['result']:
-                if (item['type'] == 'spot') and (item['name'].endswith(self.CURRENCY_FTXSpot)):
+                if (item['type'] == 'spot') and (item['name'].endswith(config.CURRENCY_FTXSpot)):
 
                     ticker = item['name'].replace('/','')
                     price = item['bid']
@@ -625,10 +562,10 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     priceIncrement = float(item['priceIncrement'])
                     punkti = math.ceil((price * 0.0007) / (1 * priceIncrement))
                     count_tickers += 1
-                    if self.write_to_file(MVS_DIR, self.CODE_FTXSpot, ex_prefix, ticker, depo, price, size, punkti,
-                                          self.PART1_FTXSpot, self.PART2_FTXSpot,
-                                          self.PART3_FTXSpot, self.PART4_FTXSpot,
-                                          self.PART5_FTXSpot, count_tickers):
+                    if self.write_to_file(MVS_DIR, config.CODE_FTXSpot, ex_prefix, ticker, depo, price, size, punkti,
+                                          config.PART1_FTXSpot, config.PART2_FTXSpot,
+                                          config.PART3_FTXSpot, config.PART4_FTXSpot,
+                                          config.PART5_FTXSpot, count_tickers):
                         number_updated_files += 1
                     else:
                         number_skipped_tickers += 1
@@ -648,7 +585,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 self.setCursor(QtGui.QCursor())
                 return
 
-            depo = float(self.DEPO_BinanceFutures) * float(self.LEVERAGE_BinanceFutures)
+            depo = float(config.DEPO_BinanceFutures) * float(config.LEVERAGE_BinanceFutures)
 
             for item in json_data_exchange['symbols']:
                 ticker = item['symbol']
@@ -660,10 +597,10 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                         price = item_prices['markPrice']
 
                         count_tickers += 1
-                        if self.write_to_file(MVS_DIR, self.CODE_BinanceFutures, ex_prefix, ticker, depo, price, size, 0,
-                                              self.PART1_BinanceFutures, self.PART2_BinanceFutures,
-                                              self.PART3_BinanceFutures, self.PART4_BinanceFutures,
-                                              self.PART5_BinanceFutures, count_tickers):
+                        if self.write_to_file(MVS_DIR, config.CODE_BinanceFutures, ex_prefix, ticker, depo, price, size, 0,
+                                              config.PART1_BinanceFutures, config.PART2_BinanceFutures,
+                                              config.PART3_BinanceFutures, config.PART4_BinanceFutures,
+                                              config.PART5_BinanceFutures, count_tickers):
                             number_updated_files += 1
                         else:
                             number_skipped_tickers += 1
@@ -683,19 +620,30 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     def showDialog(self):
         QMessageBox.about(self, "О программе",
-                          "UpdateCScalpAmounts v0.1.6\n\nПрограмма подключается к бирже FTX или Binance, "
-                          "где получает список инструментов с текущими ценами.\n\nИсходя из цены "
-                          "инструмента, значений депозита, плеча и пропорций" +
-                          " расcчитываются объемы.\n\nНастройки стаканов перезаписываются в папке"
-                          "\nC:\\Program Files (x86)\\FSR Launcher\\SubApps\\CScalp\\Data\\MVS\n"
-                          "В *.tmp-файлах заменяются значения параметров First|Second|Third|Fourth|Fifth_WorkAmount. "
-                          "Перед перезаписью настройки стаканов сохраняются в папку backup.\n\n" +
-                          "В случае, если вы хотите оставить нетронутыми какие-то объемы в стаканах, то поставьте 0 "
-                          "в соответствующем поле."
-                          "\n\n FTX: Бессрочные фьючерсы\n/api/futures (цена bid)"
-                          "\n\n FTX: Спот\n/api/markets (цена bid)"
-                          "\n\nBinance: Бессрочные фьючерсы\n/fapi/v1/exchangeInfo\n/fapi/v1/premiumIndex (цена markPrice)"
-                          "\n\nКонтакты:\nt.me/s1esarev\nL1FT@yandex.ru"
+"""UpdateCScalpAmounts v0.1.7
+
+Программа подключается к бирже FTX или Binance, где получает список инструментов с текущими ценами. \
+Исходя из цены инструмента, значений депозита, плеча и пропорций расcчитываются объемы.
+
+Настройки стаканов перезаписываются в папке "C:\\Program Files (x86)\\FSR Launcher\\SubApps\\CScalp\\Data\\MVS" (по умолчанию). \
+В *.tmp-файлах заменяются значения параметров First|Second|Third|Fourth|Fifth_WorkAmount. \
+Перед перезаписью настройки стаканов сохраняются в папку backup.
+
+В случае, если вы хотите оставить нетронутыми какие-то объемы в стаканах, то поставьте 0 в соответствующем поле.
+
+FTX: Бессрочные фьючерсы
+/api/futures (цена bid)
+
+FTX: Спот
+/api/markets (цена bid)
+
+Binance: Бессрочные фьючерсы
+/fapi/v1/exchangeInfo\n/fapi/v1/premiumIndex (цена markPrice)
+
+Контакты:
+t.me/s1esarev
+L1FT@yandex.ru
+"""
                           )
 
 
