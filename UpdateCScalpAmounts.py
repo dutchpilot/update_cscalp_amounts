@@ -1,12 +1,15 @@
-import sys, os, shutil, time, requests, math, psutil
-
+import sys
+import os
+import shutil
+import time
+import requests
+import math
+import psutil
+import design
+import config
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
 from PyQt5 import QtGui
-from PyQt5 import QtCore
-
-import design
-import config
 
 
 def my_round(var, size):
@@ -24,8 +27,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.setupUi(self)
 
         # self.setWindowIcon(QtGui.QIcon('icon.ico'))
-        self.pushButton.clicked.connect(self.updateAmounts)
-        self.pushButtonAbout.clicked.connect(self.showDialog)
+        self.pushButton.clicked.connect(self.update_amounts)
+        self.pushButtonAbout.clicked.connect(self.show_dialog)
 
         self.comboBox.addItem('FTX: Бессрочные фьючерсы')
         self.comboBox.addItem('FTX: Спот')
@@ -296,7 +299,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
             f.write(config.CSCALP_PATH + '\n')
 
-    def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, punkti, part1, part2, part3, part4, part5, count_tickers):
+    def write_to_file(self, mvs_dir, account_code, ex_prefix, ticker, depo, price, size, punkti, part1, part2,
+                      part3, part4, part5, count_tickers):
         volume_max = float(depo) / float(price)
         size = float(size)
         part1 = float(part1)
@@ -321,7 +325,6 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.tableWidget.setItem(count_tickers - 1, 4, QTableWidgetItem(str(vol3)))
         self.tableWidget.setItem(count_tickers - 1, 5, QTableWidgetItem(str(vol4)))
         self.tableWidget.setItem(count_tickers - 1, 6, QTableWidgetItem(str(vol5)))
-
 
         if self.radioButton_2.isChecked():
             filename = ex_prefix + ticker + '_Settings_' + account_code + '.tmp'
@@ -408,18 +411,16 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 self.listWidget.addItem('Файл с настройками для инструмента ' + ticker + ' не найден')
                 return False
 
+    def update_amounts(self):
 
-    def updateAmounts(self):
-
-        self.setCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+        self.setCursor(QtGui.QCursor())
         self.listWidget.clear()
         self.tableWidget.clear()
         self.tableWidget.setColumnCount(7)
         self.tableWidget.setHorizontalHeaderLabels(["Name", "Price", "V1", "V2", "V3", "V4", "V5"])
         self.tableWidget.setRowCount(0)
 
-
-        thereIsError = False
+        there_is_error = False
 
         if self.radioButton_2.isChecked():
             for proc in psutil.process_iter():
@@ -433,52 +434,33 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             depo = float(self.editDepo.text())
         except ValueError:
             self.listWidget.addItem('Ошибка! Некорректное значение депозита')
-            thereIsError = True
+            there_is_error = True
 
-        LEVERAGE = 0
+        leverage = 0
         if not self.editLeverage.text().isdigit():
             self.listWidget.addItem('Ошибка! Некорректное значение плеча')
-            thereIsError = True
+            there_is_error = True
         else:
-            LEVERAGE = float(self.editLeverage.text())
+            leverage = float(self.editLeverage.text())
 
         try:
-            PART1 = float(self.editPart1.text())
+            part = float(self.editPart1.text())
+            part = float(self.editPart2.text())
+            part = float(self.editPart3.text())
+            part = float(self.editPart4.text())
+            part = float(self.editPart5.text())
         except ValueError:
-            self.listWidget.addItem('Ошибка! Некорректное значение объема 1')
-            thereIsError = True
+            self.listWidget.addItem('Ошибка! Некорректное значение объема')
+            print('Ошибка! Некорректное значение объема')
+            there_is_error = True
 
-        try:
-            PART2 = float(self.editPart2.text())
-        except ValueError:
-            self.listWidget.addItem('Ошибка! Некорректное значение объема 2')
-            thereIsError = True
-
-        try:
-            PART3 = float(self.editPart3.text())
-        except ValueError:
-            self.listWidget.addItem('Ошибка! Некорректное значение объема 3')
-            thereIsError = True
-
-        try:
-            PART4 = float(self.editPart4.text())
-        except ValueError:
-            self.listWidget.addItem('Ошибка! Некорректное значение объема 4')
-            thereIsError = True
-
-        try:
-            PART5 = float(self.editPart5.text())
-        except ValueError:
-            self.listWidget.addItem('Ошибка! Некорректное значение объема 5')
-            thereIsError = True
-
-        if thereIsError:
+        if there_is_error:
             self.setCursor(QtGui.QCursor())
             return
 
-        #MVS_DIR = os.getenv('APPDATA') + '\CScalp\Visualizer\mvs_cs'
-        MVS_DIR = config.CSCALP_PATH + '\SubApps\CScalp\Data\MVS'
-        root_src_dir = MVS_DIR
+#       MVS_DIR = os.getenv('APPDATA') + '\CScalp\Visualizer\mvs_cs'
+        mvs_dir = config.CSCALP_PATH + '\\SubApps\\CScalp\\Data\\MVS'
+        root_src_dir = mvs_dir
         root_dst_dir = r'backup\backup ' + str(time.time())
 
         self.listWidget.addItem('Текущее UNIX-время: ' + str(time.time()))
@@ -510,7 +492,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
             try:
                 json_data = requests.get(api_endpoint).json()
-            except:
+            except Exception:
                 self.listWidget.addItem('Ошибка! Не удалось выполнить подключение к бирже.')
                 self.setCursor(QtGui.QCursor())
                 return
@@ -518,20 +500,20 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             depo = float(config.DEPO_FTXFutures) * float(config.LEVERAGE_FTXFutures)
 
             for item in json_data['result']:
-                if (item['expiryDescription'] == 'Perpetual'):
+                if item['expiryDescription'] == 'Perpetual':
 
                     ticker = item['name']
                     if ticker == 'DMG-PERP':
                         continue
                     price = item['bid']
                     size = item['sizeIncrement']
-                    priceIncrement = float(item['priceIncrement'])
-                    PriceAggregationStep = 10
+                    price_incremen = float(item['priceIncrement'])
+                    price_aggregation_step = 10
                     punkti = 0.1
-                    punkti = math.ceil((price * 0.0007) / (PriceAggregationStep * priceIncrement))
+                    punkti = math.ceil((price * 0.0007) / (price_aggregation_step * price_incremen))
 
                     count_tickers += 1
-                    if self.write_to_file(MVS_DIR, config.CODE_FTXFutures, ex_prefix, ticker, depo, price, size, punkti,
+                    if self.write_to_file(mvs_dir, config.CODE_FTXFutures, ex_prefix, ticker, depo, price, size, punkti,
                                           config.PART1_FTXFutures, config.PART2_FTXFutures,
                                           config.PART3_FTXFutures, config.PART4_FTXFutures,
                                           config.PART5_FTXFutures, count_tickers):
@@ -546,7 +528,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
             try:
                 json_data = requests.get(api_endpoint).json()
-            except:
+            except Exception:
                 self.listWidget.addItem('Ошибка! Не удалось выполнить подключение к бирже.')
                 self.setCursor(QtGui.QCursor())
                 return
@@ -556,13 +538,13 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             for item in json_data['result']:
                 if (item['type'] == 'spot') and (item['name'].endswith(config.CURRENCY_FTXSpot)):
 
-                    ticker = item['name'].replace('/','')
+                    ticker = item['name'].replace('/', '')
                     price = item['bid']
                     size = item['sizeIncrement']
-                    priceIncrement = float(item['priceIncrement'])
-                    punkti = math.ceil((price * 0.0007) / (1 * priceIncrement))
+                    price_incremen = float(item['priceIncrement'])
+                    punkti = math.ceil((price * 0.0007) / (1 * price_incremen))
                     count_tickers += 1
-                    if self.write_to_file(MVS_DIR, config.CODE_FTXSpot, ex_prefix, ticker, depo, price, size, punkti,
+                    if self.write_to_file(mvs_dir, config.CODE_FTXSpot, ex_prefix, ticker, depo, price, size, punkti,
                                           config.PART1_FTXSpot, config.PART2_FTXSpot,
                                           config.PART3_FTXSpot, config.PART4_FTXSpot,
                                           config.PART5_FTXSpot, count_tickers):
@@ -575,12 +557,12 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
             ex_prefix = 'BINAD.CCUR_FUT.'
             api_endpoint_exchange = "https://binance.com/fapi/v1/exchangeInfo"
-            api_endpoint_premiumIndex = "https://binance.com/fapi/v1/premiumIndex"
+            api_endpoint_premium_index = "https://binance.com/fapi/v1/premiumIndex"
 
             try:
                 json_data_exchange = requests.get(api_endpoint_exchange).json()
-                json_data_premiumIndex = requests.get(api_endpoint_premiumIndex).json()
-            except:
+                json_data_premium_index = requests.get(api_endpoint_premium_index).json()
+            except Exception:
                 self.listWidget.addItem('Ошибка! Не удалось выполнить подключение к бирже.')
                 self.setCursor(QtGui.QCursor())
                 return
@@ -592,12 +574,13 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 for filter in item['filters']:
                     if filter['filterType'] == 'LOT_SIZE':
                         size = filter['stepSize']
-                for item_prices in json_data_premiumIndex:
+                for item_prices in json_data_premium_index:
                     if item_prices['symbol'] == ticker:
                         price = item_prices['markPrice']
 
                         count_tickers += 1
-                        if self.write_to_file(MVS_DIR, config.CODE_BinanceFutures, ex_prefix, ticker, depo, price, size, 0,
+                        if self.write_to_file(mvs_dir, config.CODE_BinanceFutures, ex_prefix, ticker, depo,
+                                              price, size, 0,
                                               config.PART1_BinanceFutures, config.PART2_BinanceFutures,
                                               config.PART3_BinanceFutures, config.PART4_BinanceFutures,
                                               config.PART5_BinanceFutures, count_tickers):
@@ -618,15 +601,15 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         self.setCursor(QtGui.QCursor())
 
-    def showDialog(self):
+    def show_dialog(self):
         QMessageBox.about(self, "О программе",
 """UpdateCScalpAmounts v0.1.7
 
 Программа подключается к бирже FTX или Binance, где получает список инструментов с текущими ценами. \
 Исходя из цены инструмента, значений депозита, плеча и пропорций расcчитываются объемы.
 
-Настройки стаканов перезаписываются в папке "C:\\Program Files (x86)\\FSR Launcher\\SubApps\\CScalp\\Data\\MVS" (по умолчанию). \
-В *.tmp-файлах заменяются значения параметров First|Second|Third|Fourth|Fifth_WorkAmount. \
+Настройки стаканов перезаписываются в папке "C:\\Program Files (x86)\\FSR Launcher\\SubApps\\CScalp\\Data\\MVS"\
+ (по умолчанию). В *.tmp-файлах заменяются значения параметров First|Second|Third|Fourth|Fifth_WorkAmount. \
 Перед перезаписью настройки стаканов сохраняются в папку backup.
 
 В случае, если вы хотите оставить нетронутыми какие-то объемы в стаканах, то поставьте 0 в соответствующем поле.
@@ -643,8 +626,7 @@ Binance: Бессрочные фьючерсы
 Контакты:
 t.me/s1esarev
 L1FT@yandex.ru
-"""
-                          )
+""")
 
 
 def main():
