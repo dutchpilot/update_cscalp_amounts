@@ -633,6 +633,7 @@ Binance: Бессрочные фьючерсы
 Контакты:
 t.me/s1esarev
 L1FT@yandex.ru
+https://github.com/dutchpilot/update_cscalp_amounts
 """)
 
 
