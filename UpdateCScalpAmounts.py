@@ -503,9 +503,12 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 if item['expiryDescription'] == 'Perpetual':
 
                     ticker = item['name']
-                    if ticker == 'DMG-PERP':
-                        continue
+                    #print(ticker)
                     price = item['bid']
+                    if price == None:
+                        print(ticker)
+                        continue
+
                     size = item['sizeIncrement']
                     price_incremen = float(item['priceIncrement'])
                     price_aggregation_step = 10
@@ -603,7 +606,11 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     def show_dialog(self):
         QMessageBox.about(self, "О программе",
-"""UpdateCScalpAmounts v0.1.7
+"""UpdateCScalpAmounts v0.1.8
+
+0.1.8 Объемы для фьючерсов FTX, стаканы которых на текущий момент пусты,
+не учитываются. Ранее из-за появления "пустого" инструмента на бирже программа вылетала.
+0.1.7 Добавлена возможность указать каталог установки CScalp.
 
 Программа подключается к бирже FTX или Binance, где получает список инструментов с текущими ценами. \
 Исходя из цены инструмента, значений депозита, плеча и пропорций расcчитываются объемы.
